@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import random
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -98,7 +98,7 @@ def run_interleaved_bench(
                 )
 
     result: dict[str, Any] = {
-        "collected_at": datetime.now(timezone.utc).isoformat(),
+        "collected_at": datetime.now(UTC).isoformat(),
         "seed": seed,
         "reps": reps,
         "sizes": sizes_f,

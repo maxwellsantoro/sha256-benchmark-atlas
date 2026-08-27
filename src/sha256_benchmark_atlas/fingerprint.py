@@ -5,7 +5,7 @@ import os
 import platform
 import shutil
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +35,7 @@ def _first_line(text: str) -> str:
 def collect_fingerprint() -> dict[str, Any]:
     uname = platform.uname()
     fp: dict[str, Any] = {
-        "collected_at": datetime.now(timezone.utc).isoformat(),
+        "collected_at": datetime.now(UTC).isoformat(),
         "platform": {
             "system": uname.system,
             "node": uname.node,
