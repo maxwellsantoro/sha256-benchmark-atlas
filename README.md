@@ -1,5 +1,7 @@
 # SHA-256 Benchmark Atlas
 
+[![SHA-256 campaign](https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/workflows/campaign.yml/badge.svg)](https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/workflows/campaign.yml)
+
 Public atlas of **SHA-256 implementations** across languages and libraries: correctness first, then comparative performance with explicit provenance.
 
 This is **not** a “fastest programming language” shootout. Many language APIs wrap the same native backend (often OpenSSL). The registry records:
@@ -69,6 +71,18 @@ Each workflow job is one **experimental block**:
 5. Upload raw JSON artifacts; an aggregate job summarizes ratios  
 
 Host-to-host speed variation is a nuisance factor. On-machine ratios \(T_A / T_B\) cancel much of it.
+
+## Latest campaign ([run #33040294314](https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/33040294314))
+
+12 independent GitHub-hosted blocks (10× `ubuntu-24.04`, 2× `ubuntu-24.04-arm`), 5 interleaved reps, 10k correctness cases, sizes 0–1 MiB. Aggregate: [`results/latest/summary.json`](results/latest/summary.json).
+
+| Message size | Fastest (median ns/hash) | Bulk throughput @ 1 MiB |
+|---|---|---|
+| 0 B | go-stdlib (79 ns) | — |
+| 64 B | rust-sha2 (97 ns) | — |
+| 1 MiB | go-stdlib ≈ python-hashlib ≈ c-openssl (~1.58 GB/s) | same OpenSSL backend cluster |
+
+At 1 MiB, **go-stdlib**, **python-hashlib**, **c-openssl**, and **node-crypto** converge within ~1% — consistent with measuring the same underlying native primitive through different front ends. **java-jdk** ~1.4× slower; **c-ref** ~8×; **python-pure** orders of magnitude slower (expected).
 
 ## Leaderboards (conceptual)
 

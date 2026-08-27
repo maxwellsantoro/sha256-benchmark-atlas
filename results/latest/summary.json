@@ -1,0 +1,2899 @@
+{
+  "blocks": 12,
+  "rows": [
+    {
+      "impl": "c-openssl",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 378.20246,
+      "ns_per_hash_mean": 378.14081433333337,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "c-ref",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 273.14983,
+      "ns_per_hash_mean": 295.7380796666667,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 78.62611000000001,
+      "ns_per_hash_mean": 79.509619,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "java-jdk",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 20477.79228,
+      "ns_per_hash_mean": 21205.505808666665,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "node-crypto",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 965.37682,
+      "ns_per_hash_mean": 955.1999046666666,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 405.68724,
+      "ns_per_hash_mean": 408.47408133333334,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "python-pure",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 184009.72,
+      "ns_per_hash_mean": 182552.39308333336,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 0,
+      "n": 60,
+      "ns_per_hash_median": 82.08447,
+      "ns_per_hash_mean": 94.55293133333333,
+      "gb_per_s_median": 0.0,
+      "gb_per_s_mean": 0.0
+    },
+    {
+      "impl": "c-openssl",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 382.79283999999996,
+      "ns_per_hash_mean": 381.98440466666665,
+      "gb_per_s_median": 0.0026123792136945193,
+      "gb_per_s_mean": 0.0026252328553509874
+    },
+    {
+      "impl": "c-ref",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 275.4085,
+      "ns_per_hash_mean": 297.90726033333334,
+      "gb_per_s_median": 0.003630970000382071,
+      "gb_per_s_mean": 0.0034332568077381147
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 88.75435999999999,
+      "ns_per_hash_mean": 88.40572900000001,
+      "gb_per_s_median": 0.011267083917124457,
+      "gb_per_s_mean": 0.01150421610048311
+    },
+    {
+      "impl": "java-jdk",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 20812.444320000002,
+      "ns_per_hash_mean": 20616.753995333333,
+      "gb_per_s_median": 4.804821569818291e-05,
+      "gb_per_s_mean": 4.9637147027435155e-05
+    },
+    {
+      "impl": "node-crypto",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 986.21824,
+      "ns_per_hash_mean": 974.2178756666667,
+      "gb_per_s_median": 0.001013974649123001,
+      "gb_per_s_mean": 0.0010303668018995771
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 411.06928000000005,
+      "ns_per_hash_mean": 411.489872,
+      "gb_per_s_median": 0.0024326804157110016,
+      "gb_per_s_mean": 0.0024321114908825805
+    },
+    {
+      "impl": "python-pure",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 186871.49,
+      "ns_per_hash_mean": 184471.57166666668,
+      "gb_per_s_median": 5.3512710923909875e-06,
+      "gb_per_s_mean": 5.447543101421063e-06
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 1,
+      "n": 60,
+      "ns_per_hash_median": 82.97868,
+      "ns_per_hash_mean": 95.66731166666666,
+      "gb_per_s_median": 0.012051289688304538,
+      "gb_per_s_mean": 0.011443795566969292
+    },
+    {
+      "impl": "c-openssl",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 382.09045000000003,
+      "ns_per_hash_mean": 381.18730866666664,
+      "gb_per_s_median": 0.00785154462682194,
+      "gb_per_s_mean": 0.007892573173877263
+    },
+    {
+      "impl": "c-ref",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 277.11117,
+      "ns_per_hash_mean": 299.512813,
+      "gb_per_s_median": 0.010825980085256572,
+      "gb_per_s_mean": 0.010239868125578385
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 89.45107,
+      "ns_per_hash_mean": 88.93759733333333,
+      "gb_per_s_median": 0.03353789028866232,
+      "gb_per_s_mean": 0.03432306184357941
+    },
+    {
+      "impl": "java-jdk",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 21235.75893,
+      "ns_per_hash_mean": 20979.177474,
+      "gb_per_s_median": 0.00014127988269275004,
+      "gb_per_s_mean": 0.0001463875307561685
+    },
+    {
+      "impl": "node-crypto",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 981.26286,
+      "ns_per_hash_mean": 970.6333583333333,
+      "gb_per_s_median": 0.003057284852032457,
+      "gb_per_s_mean": 0.0031005393961854024
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 409.57777999999996,
+      "ns_per_hash_mean": 409.20028,
+      "gb_per_s_median": 0.0073246276083574376,
+      "gb_per_s_mean": 0.00733505542334103
+    },
+    {
+      "impl": "python-pure",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 186037.04499999998,
+      "ns_per_hash_mean": 184552.35216666668,
+      "gb_per_s_median": 1.6125827333580793e-05,
+      "gb_per_s_mean": 1.6338988815830992e-05
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 3,
+      "n": 60,
+      "ns_per_hash_median": 80.64527,
+      "ns_per_hash_mean": 94.64252066666667,
+      "gb_per_s_median": 0.03719995636973408,
+      "gb_per_s_mean": 0.03472371063754753
+    },
+    {
+      "impl": "c-openssl",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 376.62993,
+      "ns_per_hash_mean": 377.45791166666663,
+      "gb_per_s_median": 0.0849640468850528,
+      "gb_per_s_mean": 0.08504249579520719
+    },
+    {
+      "impl": "c-ref",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 311.64209,
+      "ns_per_hash_mean": 325.362787,
+      "gb_per_s_median": 0.10268193324578065,
+      "gb_per_s_mean": 0.10000554106577073
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 78.09752,
+      "ns_per_hash_mean": 79.28246933333334,
+      "gb_per_s_median": 0.4097443901525746,
+      "gb_per_s_mean": 0.40764550899910684
+    },
+    {
+      "impl": "java-jdk",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 21018.0305,
+      "ns_per_hash_mean": 20766.255702,
+      "gb_per_s_median": 0.0015225042129006026,
+      "gb_per_s_mean": 0.0015773623584851074
+    },
+    {
+      "impl": "node-crypto",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 972.56239,
+      "ns_per_hash_mean": 965.8350043333334,
+      "gb_per_s_median": 0.03290280300672303,
+      "gb_per_s_mean": 0.03324034602221346
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 408.24249999999995,
+      "ns_per_hash_mean": 406.5774566666667,
+      "gb_per_s_median": 0.07838478398227716,
+      "gb_per_s_mean": 0.07879808705644811
+    },
+    {
+      "impl": "python-pure",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 189644.9975,
+      "ns_per_hash_mean": 187130.0255,
+      "gb_per_s_median": 0.0001687363254378815,
+      "gb_per_s_mean": 0.00017191613285957977
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 32,
+      "n": 60,
+      "ns_per_hash_median": 79.6737,
+      "ns_per_hash_mean": 92.111226,
+      "gb_per_s_median": 0.4016381820344359,
+      "gb_per_s_mean": 0.38115531211257436
+    },
+    {
+      "impl": "c-openssl",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 374.43027,
+      "ns_per_hash_mean": 374.8125253333334,
+      "gb_per_s_median": 0.14688992025333117,
+      "gb_per_s_mean": 0.1472269338088216
+    },
+    {
+      "impl": "c-ref",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 326.0146,
+      "ns_per_hash_mean": 338.54926766666665,
+      "gb_per_s_median": 0.16870410474649938,
+      "gb_per_s_mean": 0.16482566269625964
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 82.18014,
+      "ns_per_hash_mean": 82.27035500000001,
+      "gb_per_s_median": 0.6692691029793005,
+      "gb_per_s_mean": 0.6762234656825359
+    },
+    {
+      "impl": "java-jdk",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 20117.461069999998,
+      "ns_per_hash_mean": 20699.389125333335,
+      "gb_per_s_median": 0.002733944497560264,
+      "gb_per_s_mean": 0.0027284563479649236
+    },
+    {
+      "impl": "node-crypto",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 973.20435,
+      "ns_per_hash_mean": 962.616123,
+      "gb_per_s_median": 0.056514541102242535,
+      "gb_per_s_mean": 0.057318241822587886
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 404.03192,
+      "ns_per_hash_mean": 402.20653000000004,
+      "gb_per_s_median": 0.1361278585866511,
+      "gb_per_s_mean": 0.13683663539084023
+    },
+    {
+      "impl": "python-pure",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 189362.3725,
+      "ns_per_hash_mean": 187772.78733333334,
+      "gb_per_s_median": 0.0002904490628273974,
+      "gb_per_s_mean": 0.00029464259916381927
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 55,
+      "n": 60,
+      "ns_per_hash_median": 79.60004,
+      "ns_per_hash_mean": 92.21480700000001,
+      "gb_per_s_median": 0.6909544266753033,
+      "gb_per_s_mean": 0.6564489993411222
+    },
+    {
+      "impl": "c-openssl",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 432.09131,
+      "ns_per_hash_mean": 429.15086833333334,
+      "gb_per_s_median": 0.12960224492531097,
+      "gb_per_s_mean": 0.13067455295779304
+    },
+    {
+      "impl": "c-ref",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 592.0251800000001,
+      "ns_per_hash_mean": 626.558604,
+      "gb_per_s_median": 0.09459058723571596,
+      "gb_per_s_mean": 0.09083333312485178
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 121.86999,
+      "ns_per_hash_mean": 125.50878833333333,
+      "gb_per_s_median": 0.4595060994003968,
+      "gb_per_s_mean": 0.4533313762463507
+    },
+    {
+      "impl": "java-jdk",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 21062.48134,
+      "ns_per_hash_mean": 21006.059867,
+      "gb_per_s_median": 0.002658756989293393,
+      "gb_per_s_mean": 0.002736940775446071
+    },
+    {
+      "impl": "node-crypto",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 1029.0210200000001,
+      "ns_per_hash_mean": 1016.321426,
+      "gb_per_s_median": 0.054420658286717466,
+      "gb_per_s_mean": 0.055301032422352486
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 452.86777,
+      "ns_per_hash_mean": 454.4185786666667,
+      "gb_per_s_median": 0.12365651404090104,
+      "gb_per_s_mean": 0.1233058395420918
+    },
+    {
+      "impl": "python-pure",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 377808.79500000004,
+      "ns_per_hash_mean": 373115.238,
+      "gb_per_s_median": 0.00014822312439741203,
+      "gb_per_s_mean": 0.00015091744288006623
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 56,
+      "n": 60,
+      "ns_per_hash_median": 127.64805,
+      "ns_per_hash_mean": 155.52141500000002,
+      "gb_per_s_median": 0.43870627325937134,
+      "gb_per_s_mean": 0.4131205503591787
+    },
+    {
+      "impl": "c-openssl",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 428.37122,
+      "ns_per_hash_mean": 425.59976133333333,
+      "gb_per_s_median": 0.14706870373747008,
+      "gb_per_s_mean": 0.14820266494973447
+    },
+    {
+      "impl": "c-ref",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 597.86124,
+      "ns_per_hash_mean": 628.5209493333333,
+      "gb_per_s_median": 0.10537632896245633,
+      "gb_per_s_mean": 0.10188088987642997
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 121.98629,
+      "ns_per_hash_mean": 123.99793666666666,
+      "gb_per_s_median": 0.5164541143327535,
+      "gb_per_s_mean": 0.5158301358979265
+    },
+    {
+      "impl": "java-jdk",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 20884.89148,
+      "ns_per_hash_mean": 20835.067163666667,
+      "gb_per_s_median": 0.0030166107799134,
+      "gb_per_s_mean": 0.0030934054941625876
+    },
+    {
+      "impl": "node-crypto",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 1025.55556,
+      "ns_per_hash_mean": 1011.6912596666666,
+      "gb_per_s_median": 0.06143011986851128,
+      "gb_per_s_mean": 0.06248061040917078
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 451.71495000000004,
+      "ns_per_hash_mean": 452.24802900000003,
+      "gb_per_s_median": 0.13946864958593444,
+      "gb_per_s_mean": 0.13935305278613735
+    },
+    {
+      "impl": "python-pure",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 374557.7125,
+      "ns_per_hash_mean": 370679.23699999996,
+      "gb_per_s_median": 0.00016819842924331254,
+      "gb_per_s_mean": 0.00017085511149143615
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 63,
+      "n": 60,
+      "ns_per_hash_median": 130.56169999999997,
+      "ns_per_hash_mean": 157.37575766666666,
+      "gb_per_s_median": 0.4825304834527029,
+      "gb_per_s_mean": 0.45611352423185847
+    },
+    {
+      "impl": "c-openssl",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 423.96638,
+      "ns_per_hash_mean": 422.0285376666667,
+      "gb_per_s_median": 0.15095536738605517,
+      "gb_per_s_mean": 0.15182007245005674
+    },
+    {
+      "impl": "c-ref",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 598.0566200000001,
+      "ns_per_hash_mean": 632.1387043333333,
+      "gb_per_s_median": 0.1070132828824768,
+      "gb_per_s_mean": 0.10290309684448357
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 125.52978999999999,
+      "ns_per_hash_mean": 126.51122833333334,
+      "gb_per_s_median": 0.5098567348156373,
+      "gb_per_s_mean": 0.5156821425628303
+    },
+    {
+      "impl": "java-jdk",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 21296.316,
+      "ns_per_hash_mean": 20970.31530366667,
+      "gb_per_s_median": 0.003005347939192364,
+      "gb_per_s_mean": 0.0031225460062900426
+    },
+    {
+      "impl": "node-crypto",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 1006.90517,
+      "ns_per_hash_mean": 990.8805736666667,
+      "gb_per_s_median": 0.06356111305522953,
+      "gb_per_s_mean": 0.06479406158285453
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 433.24338,
+      "ns_per_hash_mean": 431.0675776666667,
+      "gb_per_s_median": 0.14772298890620184,
+      "gb_per_s_mean": 0.14856837117045524
+    },
+    {
+      "impl": "python-pure",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 377894.1775,
+      "ns_per_hash_mean": 375470.7850833333,
+      "gb_per_s_median": 0.00016935974180961162,
+      "gb_per_s_mean": 0.0001714827191064034
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 64,
+      "n": 60,
+      "ns_per_hash_median": 96.67471,
+      "ns_per_hash_mean": 131.078009,
+      "gb_per_s_median": 0.6620139206813734,
+      "gb_per_s_mean": 0.6171917658292205
+    },
+    {
+      "impl": "c-openssl",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 425.9335,
+      "ns_per_hash_mean": 423.88263166666667,
+      "gb_per_s_median": 0.15260608939753761,
+      "gb_per_s_mean": 0.1534993485879991
+    },
+    {
+      "impl": "c-ref",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 601.3639000000001,
+      "ns_per_hash_mean": 635.1423225,
+      "gb_per_s_median": 0.10808763269385863,
+      "gb_per_s_mean": 0.10403143658734249
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 136.328225,
+      "ns_per_hash_mean": 136.86210083333333,
+      "gb_per_s_median": 0.4767908322366811,
+      "gb_per_s_mean": 0.4857714601427731
+    },
+    {
+      "impl": "java-jdk",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 40549.666225,
+      "ns_per_hash_mean": 39664.63159916666,
+      "gb_per_s_median": 0.0016029738180483675,
+      "gb_per_s_mean": 0.0017099149749098777
+    },
+    {
+      "impl": "node-crypto",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 1300.170475,
+      "ns_per_hash_mean": 1269.3991358333333,
+      "gb_per_s_median": 0.049993444317616015,
+      "gb_per_s_mean": 0.05153628499494738
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 436.09749999999997,
+      "ns_per_hash_mean": 435.9603783333333,
+      "gb_per_s_median": 0.14904923942244827,
+      "gb_per_s_mean": 0.14927362841163155
+    },
+    {
+      "impl": "python-pure",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 382094.03,
+      "ns_per_hash_mean": 377053.63033333333,
+      "gb_per_s_median": 0.0001701152099531365,
+      "gb_per_s_mean": 0.00017342660586504356
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 65,
+      "n": 60,
+      "ns_per_hash_median": 104.960425,
+      "ns_per_hash_mean": 138.72528833333334,
+      "gb_per_s_median": 0.6192810314097155,
+      "gb_per_s_mean": 0.5739609066675514
+    },
+    {
+      "impl": "c-openssl",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 421.4669,
+      "ns_per_hash_mean": 420.4960725,
+      "gb_per_s_median": 0.18981324546893125,
+      "gb_per_s_mean": 0.1904702630529341
+    },
+    {
+      "impl": "c-ref",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 617.7493,
+      "ns_per_hash_mean": 647.3896083333333,
+      "gb_per_s_median": 0.1295023767342945,
+      "gb_per_s_mean": 0.12548318048721352
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 128.35375,
+      "ns_per_hash_mean": 130.1244275,
+      "gb_per_s_median": 0.6232827249987287,
+      "gb_per_s_mean": 0.6262043300804533
+    },
+    {
+      "impl": "java-jdk",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 38816.960699999996,
+      "ns_per_hash_mean": 38752.44216416667,
+      "gb_per_s_median": 0.0020609657719502907,
+      "gb_per_s_mean": 0.0021533455092392372
+    },
+    {
+      "impl": "node-crypto",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 1293.9346249999999,
+      "ns_per_hash_mean": 1261.4507108333335,
+      "gb_per_s_median": 0.06182698750628082,
+      "gb_per_s_mean": 0.06388878315635402
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 434.496575,
+      "ns_per_hash_mean": 432.76281833333337,
+      "gb_per_s_median": 0.1841211362319193,
+      "gb_per_s_mean": 0.1850572032643371
+    },
+    {
+      "impl": "python-pure",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 381442.12,
+      "ns_per_hash_mean": 377523.8406666667,
+      "gb_per_s_median": 0.00020973040474573908,
+      "gb_per_s_mean": 0.00021326042287050654
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 80,
+      "n": 60,
+      "ns_per_hash_median": 104.409775,
+      "ns_per_hash_mean": 137.067885,
+      "gb_per_s_median": 0.7662120172778795,
+      "gb_per_s_mean": 0.7188051504365666
+    },
+    {
+      "impl": "c-openssl",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 470.866575,
+      "ns_per_hash_mean": 468.2498625,
+      "gb_per_s_median": 0.26971547288747144,
+      "gb_per_s_mean": 0.2713321330037196
+    },
+    {
+      "impl": "c-ref",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 921.5346999999999,
+      "ns_per_hash_mean": 963.8395058333333,
+      "gb_per_s_median": 0.1378136231388635,
+      "gb_per_s_mean": 0.13370142271510752
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 172.6335,
+      "ns_per_hash_mean": 172.92637000000002,
+      "gb_per_s_median": 0.735666668473718,
+      "gb_per_s_mean": 0.7484606387967607
+    },
+    {
+      "impl": "java-jdk",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 40193.546149999995,
+      "ns_per_hash_mean": 38518.774157500004,
+      "gb_per_s_median": 0.0031597119551303432,
+      "gb_per_s_mean": 0.0034220138124053793
+    },
+    {
+      "impl": "node-crypto",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 1338.7715,
+      "ns_per_hash_mean": 1305.9704533333331,
+      "gb_per_s_median": 0.09486311091646717,
+      "gb_per_s_mean": 0.09800101839619167
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 475.5593,
+      "ns_per_hash_mean": 476.0785125,
+      "gb_per_s_median": 0.26705403914063097,
+      "gb_per_s_mean": 0.2668480422978679
+    },
+    {
+      "impl": "python-pure",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 576505.6799999999,
+      "ns_per_hash_mean": 570428.206,
+      "gb_per_s_median": 0.0002202927846567207,
+      "gb_per_s_mean": 0.00022413774248823893
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 127,
+      "n": 60,
+      "ns_per_hash_median": 155.667975,
+      "ns_per_hash_mean": 203.2898725,
+      "gb_per_s_median": 0.815839018269614,
+      "gb_per_s_mean": 0.7638794661119361
+    },
+    {
+      "impl": "c-openssl",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 462.613275,
+      "ns_per_hash_mean": 462.3689191666666,
+      "gb_per_s_median": 0.2766889916855003,
+      "gb_per_s_mean": 0.2769217175106966
+    },
+    {
+      "impl": "c-ref",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 930.70555,
+      "ns_per_hash_mean": 973.7156508333334,
+      "gb_per_s_median": 0.13753007241172743,
+      "gb_per_s_mean": 0.13341625092292325
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 167.200925,
+      "ns_per_hash_mean": 168.05001333333334,
+      "gb_per_s_median": 0.7655609460236648,
+      "gb_per_s_mean": 0.7776558137885411
+    },
+    {
+      "impl": "java-jdk",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 40784.646475,
+      "ns_per_hash_mean": 39470.192405,
+      "gb_per_s_median": 0.003138473927739571,
+      "gb_per_s_mean": 0.003397044963227224
+    },
+    {
+      "impl": "node-crypto",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 1334.9596000000001,
+      "ns_per_hash_mean": 1297.6772833333334,
+      "gb_per_s_median": 0.09588306722710446,
+      "gb_per_s_mean": 0.09936957737908689
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 473.288925,
+      "ns_per_hash_mean": 477.7789783333334,
+      "gb_per_s_median": 0.2704481346158354,
+      "gb_per_s_mean": 0.2684364574460554
+    },
+    {
+      "impl": "python-pure",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 569514.1499999999,
+      "ns_per_hash_mean": 565599.4293333333,
+      "gb_per_s_median": 0.00022475316111380628,
+      "gb_per_s_mean": 0.0002277412952011457
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 128,
+      "n": 60,
+      "ns_per_hash_median": 142.372275,
+      "ns_per_hash_mean": 193.020435,
+      "gb_per_s_median": 0.8990520648455038,
+      "gb_per_s_mean": 0.8377982281513263
+    },
+    {
+      "impl": "c-openssl",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 545.61455,
+      "ns_per_hash_mean": 544.170105,
+      "gb_per_s_median": 0.46919570291412693,
+      "gb_per_s_mean": 0.47050015252021427
+    },
+    {
+      "impl": "c-ref",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 1574.1179750000001,
+      "ns_per_hash_mean": 1636.3198441666668,
+      "gb_per_s_median": 0.16263078720295204,
+      "gb_per_s_mean": 0.15868799887114723
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 246.44369999999998,
+      "ns_per_hash_mean": 249.64509583333333,
+      "gb_per_s_median": 1.0387768867014673,
+      "gb_per_s_mean": 1.046441663289422
+    },
+    {
+      "impl": "java-jdk",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 39265.4845,
+      "ns_per_hash_mean": 38986.202645,
+      "gb_per_s_median": 0.006519803756938737,
+      "gb_per_s_mean": 0.006839213298892404
+    },
+    {
+      "impl": "node-crypto",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 1420.261525,
+      "ns_per_hash_mean": 1382.5100233333333,
+      "gb_per_s_median": 0.180248493618687,
+      "gb_per_s_mean": 0.18653998884076314
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 558.191775,
+      "ns_per_hash_mean": 554.2014833333334,
+      "gb_per_s_median": 0.45862374091941704,
+      "gb_per_s_mean": 0.4622453886671307
+    },
+    {
+      "impl": "python-pure",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 959469.2,
+      "ns_per_hash_mean": 950564.2733333333,
+      "gb_per_s_median": 0.0002668141929005268,
+      "gb_per_s_mean": 0.0002709793717239601
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 256,
+      "n": 60,
+      "ns_per_hash_median": 232.77535,
+      "ns_per_hash_mean": 315.64681583333333,
+      "gb_per_s_median": 1.0997728454604032,
+      "gb_per_s_mean": 1.0240183823671012
+    },
+    {
+      "impl": "c-openssl",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 1033.2291249999998,
+      "ns_per_hash_mean": 1033.7515475,
+      "gb_per_s_median": 0.9910676883369883,
+      "gb_per_s_mean": 0.9957771082038434
+    },
+    {
+      "impl": "c-ref",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 5434.0714499999995,
+      "ns_per_hash_mean": 5635.83104,
+      "gb_per_s_median": 0.1884409819480764,
+      "gb_per_s_mean": 0.18411238791811296
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 732.7618,
+      "ns_per_hash_mean": 740.6414525,
+      "gb_per_s_median": 1.397452972220507,
+      "gb_per_s_mean": 1.4114711777771487
+    },
+    {
+      "impl": "java-jdk",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 43568.146575000006,
+      "ns_per_hash_mean": 42712.3851575,
+      "gb_per_s_median": 0.023503756076987254,
+      "gb_per_s_mean": 0.025519444526072223
+    },
+    {
+      "impl": "node-crypto",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 1907.4221,
+      "ns_per_hash_mean": 1845.0771491666667,
+      "gb_per_s_median": 0.5368512650378823,
+      "gb_per_s_mean": 0.5604792951782464
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 1047.144125,
+      "ns_per_hash_mean": 1039.8039541666667,
+      "gb_per_s_median": 0.9778979516288437,
+      "gb_per_s_mean": 0.9918349007869545
+    },
+    {
+      "impl": "python-pure",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 3257401.9,
+      "ns_per_hash_mean": 3255203.2136666668,
+      "gb_per_s_median": 0.00031436115201760953,
+      "gb_per_s_mean": 0.00031680771639367784
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 1024,
+      "n": 60,
+      "ns_per_hash_median": 781.358125,
+      "ns_per_hash_mean": 1053.1381425,
+      "gb_per_s_median": 1.3105386332492757,
+      "gb_per_s_mean": 1.226277690394318
+    },
+    {
+      "impl": "c-openssl",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 2991.7505,
+      "ns_per_hash_mean": 2997.265958333333,
+      "gb_per_s_median": 1.3690982346009197,
+      "gb_per_s_mean": 1.3870011925968064
+    },
+    {
+      "impl": "c-ref",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 20895.771249999998,
+      "ns_per_hash_mean": 21651.38630833333,
+      "gb_per_s_median": 0.19602062763408695,
+      "gb_per_s_mean": 0.19167122301130446
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 2699.72825,
+      "ns_per_hash_mean": 2708.01845,
+      "gb_per_s_median": 1.5171904938062468,
+      "gb_per_s_mean": 1.5438776819140192
+    },
+    {
+      "impl": "java-jdk",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 154060.27775,
+      "ns_per_hash_mean": 163337.51109166667,
+      "gb_per_s_median": 0.026586997096066975,
+      "gb_per_s_mean": 0.028809886343801685
+    },
+    {
+      "impl": "node-crypto",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 4905.945,
+      "ns_per_hash_mean": 4758.9279166666665,
+      "gb_per_s_median": 0.8349057370131429,
+      "gb_per_s_mean": 0.8721425258484486
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 3089.77625,
+      "ns_per_hash_mean": 3070.1863749999998,
+      "gb_per_s_median": 1.325662520905404,
+      "gb_per_s_mean": 1.3551719489721339
+    },
+    {
+      "impl": "python-pure",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 12427793.75,
+      "ns_per_hash_mean": 12406507.131666666,
+      "gb_per_s_median": 0.0003295838907687588,
+      "gb_per_s_mean": 0.00033237634736078814
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 4096,
+      "n": 60,
+      "ns_per_hash_median": 2966.52625,
+      "ns_per_hash_mean": 4013.977733333333,
+      "gb_per_s_median": 1.380739510609617,
+      "gb_per_s_mean": 1.2844275818974502
+    },
+    {
+      "impl": "c-openssl",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 41695.0255,
+      "ns_per_hash_mean": 42059.18085,
+      "gb_per_s_median": 1.571794688034028,
+      "gb_per_s_mean": 1.5923049471785977
+    },
+    {
+      "impl": "c-ref",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 329346.69724999997,
+      "ns_per_hash_mean": 340860.7229333333,
+      "gb_per_s_median": 0.19898789970593989,
+      "gb_per_s_mean": 0.19475865048105778
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 41380.320999999996,
+      "ns_per_hash_mean": 41827.16321666667,
+      "gb_per_s_median": 1.583747994862137,
+      "gb_per_s_mean": 1.5989502446496748
+    },
+    {
+      "impl": "java-jdk",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 159193.1055,
+      "ns_per_hash_mean": 147225.33144166664,
+      "gb_per_s_median": 0.41167629646690235,
+      "gb_per_s_mean": 0.46150433796316737
+    },
+    {
+      "impl": "node-crypto",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 43567.8745,
+      "ns_per_hash_mean": 43809.13826666667,
+      "gb_per_s_median": 1.5042276202601925,
+      "gb_per_s_mean": 1.5261009583873613
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 41723.282250000004,
+      "ns_per_hash_mean": 42119.03344166667,
+      "gb_per_s_median": 1.5707297335018409,
+      "gb_per_s_mean": 1.5901589590834584
+    },
+    {
+      "impl": "python-pure",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 192878764.39999998,
+      "ns_per_hash_mean": 193469517.11,
+      "gb_per_s_median": 0.0003397786679456414,
+      "gb_per_s_mean": 0.00034091611124822485
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 65536,
+      "n": 60,
+      "ns_per_hash_median": 46623.7775,
+      "ns_per_hash_mean": 62744.01506666667,
+      "gb_per_s_median": 1.4056347108950549,
+      "gb_per_s_mean": 1.316839936916915
+    },
+    {
+      "impl": "c-openssl",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 662295.5775,
+      "ns_per_hash_mean": 668309.6279166666,
+      "gb_per_s_median": 1.5832447728530892,
+      "gb_per_s_mean": 1.6036016645315572
+    },
+    {
+      "impl": "c-ref",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 5302229.67,
+      "ns_per_hash_mean": 5479318.765833333,
+      "gb_per_s_median": 0.19776133391063422,
+      "gb_per_s_mean": 0.19386192621292878
+    },
+    {
+      "impl": "go-stdlib",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 661749.2775,
+      "ns_per_hash_mean": 668940.6879166666,
+      "gb_per_s_median": 1.5845517895120271,
+      "gb_per_s_mean": 1.599277776679118
+    },
+    {
+      "impl": "java-jdk",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 926529.4425,
+      "ns_per_hash_mean": 890396.6505,
+      "gb_per_s_median": 1.1317496733063637,
+      "gb_per_s_mean": 1.2053970607865923
+    },
+    {
+      "impl": "node-crypto",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 668772.4625,
+      "ns_per_hash_mean": 673365.4883333333,
+      "gb_per_s_median": 1.5679115599596973,
+      "gb_per_s_mean": 1.590115074976257
+    },
+    {
+      "impl": "python-hashlib",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 662140.7825,
+      "ns_per_hash_mean": 668163.5746666666,
+      "gb_per_s_median": 1.583614886793385,
+      "gb_per_s_mean": 1.6042778743254973
+    },
+    {
+      "impl": "python-pure",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 3015068843.0,
+      "ns_per_hash_mean": 2978700957.2833333,
+      "gb_per_s_median": 0.00034777852203491847,
+      "gb_per_s_mean": 0.00035313990314637635
+    },
+    {
+      "impl": "rust-sha2",
+      "size": 1048576,
+      "n": 60,
+      "ns_per_hash_median": 746008.635,
+      "ns_per_hash_mean": 1004003.4738333334,
+      "gb_per_s_median": 1.4055815856694567,
+      "gb_per_s_mean": 1.3161826370103955
+    }
+  ],
+  "rankings_by_size": {
+    "0": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 78.62611000000001,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 2,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 82.08447,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 3,
+        "impl": "c-ref",
+        "ns_per_hash_median": 273.14983,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 4,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 378.20246,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 5,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 405.68724,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 965.37682,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 20477.79228,
+        "gb_per_s_median": 0.0
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 184009.72,
+        "gb_per_s_median": 0.0
+      }
+    ],
+    "1": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 82.97868,
+        "gb_per_s_median": 0.012051289688304538
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 88.75435999999999,
+        "gb_per_s_median": 0.011267083917124457
+      },
+      {
+        "rank": 3,
+        "impl": "c-ref",
+        "ns_per_hash_median": 275.4085,
+        "gb_per_s_median": 0.003630970000382071
+      },
+      {
+        "rank": 4,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 382.79283999999996,
+        "gb_per_s_median": 0.0026123792136945193
+      },
+      {
+        "rank": 5,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 411.06928000000005,
+        "gb_per_s_median": 0.0024326804157110016
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 986.21824,
+        "gb_per_s_median": 0.001013974649123001
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 20812.444320000002,
+        "gb_per_s_median": 4.804821569818291e-05
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 186871.49,
+        "gb_per_s_median": 5.3512710923909875e-06
+      }
+    ],
+    "3": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 80.64527,
+        "gb_per_s_median": 0.03719995636973408
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 89.45107,
+        "gb_per_s_median": 0.03353789028866232
+      },
+      {
+        "rank": 3,
+        "impl": "c-ref",
+        "ns_per_hash_median": 277.11117,
+        "gb_per_s_median": 0.010825980085256572
+      },
+      {
+        "rank": 4,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 382.09045000000003,
+        "gb_per_s_median": 0.00785154462682194
+      },
+      {
+        "rank": 5,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 409.57777999999996,
+        "gb_per_s_median": 0.0073246276083574376
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 981.26286,
+        "gb_per_s_median": 0.003057284852032457
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 21235.75893,
+        "gb_per_s_median": 0.00014127988269275004
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 186037.04499999998,
+        "gb_per_s_median": 1.6125827333580793e-05
+      }
+    ],
+    "32": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 78.09752,
+        "gb_per_s_median": 0.4097443901525746
+      },
+      {
+        "rank": 2,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 79.6737,
+        "gb_per_s_median": 0.4016381820344359
+      },
+      {
+        "rank": 3,
+        "impl": "c-ref",
+        "ns_per_hash_median": 311.64209,
+        "gb_per_s_median": 0.10268193324578065
+      },
+      {
+        "rank": 4,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 376.62993,
+        "gb_per_s_median": 0.0849640468850528
+      },
+      {
+        "rank": 5,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 408.24249999999995,
+        "gb_per_s_median": 0.07838478398227716
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 972.56239,
+        "gb_per_s_median": 0.03290280300672303
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 21018.0305,
+        "gb_per_s_median": 0.0015225042129006026
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 189644.9975,
+        "gb_per_s_median": 0.0001687363254378815
+      }
+    ],
+    "55": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 79.60004,
+        "gb_per_s_median": 0.6909544266753033
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 82.18014,
+        "gb_per_s_median": 0.6692691029793005
+      },
+      {
+        "rank": 3,
+        "impl": "c-ref",
+        "ns_per_hash_median": 326.0146,
+        "gb_per_s_median": 0.16870410474649938
+      },
+      {
+        "rank": 4,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 374.43027,
+        "gb_per_s_median": 0.14688992025333117
+      },
+      {
+        "rank": 5,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 404.03192,
+        "gb_per_s_median": 0.1361278585866511
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 973.20435,
+        "gb_per_s_median": 0.056514541102242535
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 20117.461069999998,
+        "gb_per_s_median": 0.002733944497560264
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 189362.3725,
+        "gb_per_s_median": 0.0002904490628273974
+      }
+    ],
+    "56": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 121.86999,
+        "gb_per_s_median": 0.4595060994003968
+      },
+      {
+        "rank": 2,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 127.64805,
+        "gb_per_s_median": 0.43870627325937134
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 432.09131,
+        "gb_per_s_median": 0.12960224492531097
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 452.86777,
+        "gb_per_s_median": 0.12365651404090104
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 592.0251800000001,
+        "gb_per_s_median": 0.09459058723571596
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1029.0210200000001,
+        "gb_per_s_median": 0.054420658286717466
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 21062.48134,
+        "gb_per_s_median": 0.002658756989293393
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 377808.79500000004,
+        "gb_per_s_median": 0.00014822312439741203
+      }
+    ],
+    "63": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 121.98629,
+        "gb_per_s_median": 0.5164541143327535
+      },
+      {
+        "rank": 2,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 130.56169999999997,
+        "gb_per_s_median": 0.4825304834527029
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 428.37122,
+        "gb_per_s_median": 0.14706870373747008
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 451.71495000000004,
+        "gb_per_s_median": 0.13946864958593444
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 597.86124,
+        "gb_per_s_median": 0.10537632896245633
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1025.55556,
+        "gb_per_s_median": 0.06143011986851128
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 20884.89148,
+        "gb_per_s_median": 0.0030166107799134
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 374557.7125,
+        "gb_per_s_median": 0.00016819842924331254
+      }
+    ],
+    "64": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 96.67471,
+        "gb_per_s_median": 0.6620139206813734
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 125.52978999999999,
+        "gb_per_s_median": 0.5098567348156373
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 423.96638,
+        "gb_per_s_median": 0.15095536738605517
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 433.24338,
+        "gb_per_s_median": 0.14772298890620184
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 598.0566200000001,
+        "gb_per_s_median": 0.1070132828824768
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1006.90517,
+        "gb_per_s_median": 0.06356111305522953
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 21296.316,
+        "gb_per_s_median": 0.003005347939192364
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 377894.1775,
+        "gb_per_s_median": 0.00016935974180961162
+      }
+    ],
+    "65": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 104.960425,
+        "gb_per_s_median": 0.6192810314097155
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 136.328225,
+        "gb_per_s_median": 0.4767908322366811
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 425.9335,
+        "gb_per_s_median": 0.15260608939753761
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 436.09749999999997,
+        "gb_per_s_median": 0.14904923942244827
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 601.3639000000001,
+        "gb_per_s_median": 0.10808763269385863
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1300.170475,
+        "gb_per_s_median": 0.049993444317616015
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 40549.666225,
+        "gb_per_s_median": 0.0016029738180483675
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 382094.03,
+        "gb_per_s_median": 0.0001701152099531365
+      }
+    ],
+    "80": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 104.409775,
+        "gb_per_s_median": 0.7662120172778795
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 128.35375,
+        "gb_per_s_median": 0.6232827249987287
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 421.4669,
+        "gb_per_s_median": 0.18981324546893125
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 434.496575,
+        "gb_per_s_median": 0.1841211362319193
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 617.7493,
+        "gb_per_s_median": 0.1295023767342945
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1293.9346249999999,
+        "gb_per_s_median": 0.06182698750628082
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 38816.960699999996,
+        "gb_per_s_median": 0.0020609657719502907
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 381442.12,
+        "gb_per_s_median": 0.00020973040474573908
+      }
+    ],
+    "127": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 155.667975,
+        "gb_per_s_median": 0.815839018269614
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 172.6335,
+        "gb_per_s_median": 0.735666668473718
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 470.866575,
+        "gb_per_s_median": 0.26971547288747144
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 475.5593,
+        "gb_per_s_median": 0.26705403914063097
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 921.5346999999999,
+        "gb_per_s_median": 0.1378136231388635
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1338.7715,
+        "gb_per_s_median": 0.09486311091646717
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 40193.546149999995,
+        "gb_per_s_median": 0.0031597119551303432
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 576505.6799999999,
+        "gb_per_s_median": 0.0002202927846567207
+      }
+    ],
+    "128": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 142.372275,
+        "gb_per_s_median": 0.8990520648455038
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 167.200925,
+        "gb_per_s_median": 0.7655609460236648
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 462.613275,
+        "gb_per_s_median": 0.2766889916855003
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 473.288925,
+        "gb_per_s_median": 0.2704481346158354
+      },
+      {
+        "rank": 5,
+        "impl": "c-ref",
+        "ns_per_hash_median": 930.70555,
+        "gb_per_s_median": 0.13753007241172743
+      },
+      {
+        "rank": 6,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1334.9596000000001,
+        "gb_per_s_median": 0.09588306722710446
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 40784.646475,
+        "gb_per_s_median": 0.003138473927739571
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 569514.1499999999,
+        "gb_per_s_median": 0.00022475316111380628
+      }
+    ],
+    "256": [
+      {
+        "rank": 1,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 232.77535,
+        "gb_per_s_median": 1.0997728454604032
+      },
+      {
+        "rank": 2,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 246.44369999999998,
+        "gb_per_s_median": 1.0387768867014673
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 545.61455,
+        "gb_per_s_median": 0.46919570291412693
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 558.191775,
+        "gb_per_s_median": 0.45862374091941704
+      },
+      {
+        "rank": 5,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1420.261525,
+        "gb_per_s_median": 0.180248493618687
+      },
+      {
+        "rank": 6,
+        "impl": "c-ref",
+        "ns_per_hash_median": 1574.1179750000001,
+        "gb_per_s_median": 0.16263078720295204
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 39265.4845,
+        "gb_per_s_median": 0.006519803756938737
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 959469.2,
+        "gb_per_s_median": 0.0002668141929005268
+      }
+    ],
+    "1024": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 732.7618,
+        "gb_per_s_median": 1.397452972220507
+      },
+      {
+        "rank": 2,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 781.358125,
+        "gb_per_s_median": 1.3105386332492757
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 1033.2291249999998,
+        "gb_per_s_median": 0.9910676883369883
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 1047.144125,
+        "gb_per_s_median": 0.9778979516288437
+      },
+      {
+        "rank": 5,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 1907.4221,
+        "gb_per_s_median": 0.5368512650378823
+      },
+      {
+        "rank": 6,
+        "impl": "c-ref",
+        "ns_per_hash_median": 5434.0714499999995,
+        "gb_per_s_median": 0.1884409819480764
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 43568.146575000006,
+        "gb_per_s_median": 0.023503756076987254
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 3257401.9,
+        "gb_per_s_median": 0.00031436115201760953
+      }
+    ],
+    "4096": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 2699.72825,
+        "gb_per_s_median": 1.5171904938062468
+      },
+      {
+        "rank": 2,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 2966.52625,
+        "gb_per_s_median": 1.380739510609617
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 2991.7505,
+        "gb_per_s_median": 1.3690982346009197
+      },
+      {
+        "rank": 4,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 3089.77625,
+        "gb_per_s_median": 1.325662520905404
+      },
+      {
+        "rank": 5,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 4905.945,
+        "gb_per_s_median": 0.8349057370131429
+      },
+      {
+        "rank": 6,
+        "impl": "c-ref",
+        "ns_per_hash_median": 20895.771249999998,
+        "gb_per_s_median": 0.19602062763408695
+      },
+      {
+        "rank": 7,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 154060.27775,
+        "gb_per_s_median": 0.026586997096066975
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 12427793.75,
+        "gb_per_s_median": 0.0003295838907687588
+      }
+    ],
+    "65536": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 41380.320999999996,
+        "gb_per_s_median": 1.583747994862137
+      },
+      {
+        "rank": 2,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 41695.0255,
+        "gb_per_s_median": 1.571794688034028
+      },
+      {
+        "rank": 3,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 41723.282250000004,
+        "gb_per_s_median": 1.5707297335018409
+      },
+      {
+        "rank": 4,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 43567.8745,
+        "gb_per_s_median": 1.5042276202601925
+      },
+      {
+        "rank": 5,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 46623.7775,
+        "gb_per_s_median": 1.4056347108950549
+      },
+      {
+        "rank": 6,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 159193.1055,
+        "gb_per_s_median": 0.41167629646690235
+      },
+      {
+        "rank": 7,
+        "impl": "c-ref",
+        "ns_per_hash_median": 329346.69724999997,
+        "gb_per_s_median": 0.19898789970593989
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 192878764.39999998,
+        "gb_per_s_median": 0.0003397786679456414
+      }
+    ],
+    "1048576": [
+      {
+        "rank": 1,
+        "impl": "go-stdlib",
+        "ns_per_hash_median": 661749.2775,
+        "gb_per_s_median": 1.5845517895120271
+      },
+      {
+        "rank": 2,
+        "impl": "python-hashlib",
+        "ns_per_hash_median": 662140.7825,
+        "gb_per_s_median": 1.583614886793385
+      },
+      {
+        "rank": 3,
+        "impl": "c-openssl",
+        "ns_per_hash_median": 662295.5775,
+        "gb_per_s_median": 1.5832447728530892
+      },
+      {
+        "rank": 4,
+        "impl": "node-crypto",
+        "ns_per_hash_median": 668772.4625,
+        "gb_per_s_median": 1.5679115599596973
+      },
+      {
+        "rank": 5,
+        "impl": "rust-sha2",
+        "ns_per_hash_median": 746008.635,
+        "gb_per_s_median": 1.4055815856694567
+      },
+      {
+        "rank": 6,
+        "impl": "java-jdk",
+        "ns_per_hash_median": 926529.4425,
+        "gb_per_s_median": 1.1317496733063637
+      },
+      {
+        "rank": 7,
+        "impl": "c-ref",
+        "ns_per_hash_median": 5302229.67,
+        "gb_per_s_median": 0.19776133391063422
+      },
+      {
+        "rank": 8,
+        "impl": "python-pure",
+        "ns_per_hash_median": 3015068843.0,
+        "gb_per_s_median": 0.00034777852203491847
+      }
+    ]
+  },
+  "ratios_vs_baseline": [
+    {
+      "size": 0,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 0,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.7222317644364344
+    },
+    {
+      "size": 0,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.20789423209991817
+    },
+    {
+      "size": 0,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 54.14505310198142
+    },
+    {
+      "size": 0,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.5525397693076877
+    },
+    {
+      "size": 0,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0726721343906647
+    },
+    {
+      "size": 0,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 486.5376073968425
+    },
+    {
+      "size": 0,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.21703843491657882
+    },
+    {
+      "size": 1,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 1,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.7194713986813338
+    },
+    {
+      "size": 1,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.23186003165576452
+    },
+    {
+      "size": 1,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 54.369993754324156
+    },
+    {
+      "size": 1,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.5763758799668253
+    },
+    {
+      "size": 1,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0738687797817748
+    },
+    {
+      "size": 1,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 488.1791676145249
+    },
+    {
+      "size": 1,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.21677176615947155
+    },
+    {
+      "size": 3,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 3,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.7252501861797384
+    },
+    {
+      "size": 3,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.2341096721993444
+    },
+    {
+      "size": 3,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 55.5778322384137
+    },
+    {
+      "size": 3,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.568142857273716
+    },
+    {
+      "size": 3,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0719393274550566
+    },
+    {
+      "size": 3,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 486.8926847033208
+    },
+    {
+      "size": 3,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.2110632966618244
+    },
+    {
+      "size": 32,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 32,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.8274490824454658
+    },
+    {
+      "size": 32,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.20735877257550933
+    },
+    {
+      "size": 32,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 55.8055237405057
+    },
+    {
+      "size": 32,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.5822758961296572
+    },
+    {
+      "size": 32,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0839353632888389
+    },
+    {
+      "size": 32,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 503.5314041557982
+    },
+    {
+      "size": 32,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.2115437294109897
+    },
+    {
+      "size": 55,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 55,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.8706950963125923
+    },
+    {
+      "size": 55,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.21948049232237551
+    },
+    {
+      "size": 55,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 53.72819101938526
+    },
+    {
+      "size": 55,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.5991604524922622
+    },
+    {
+      "size": 55,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0790578443350747
+    },
+    {
+      "size": 55,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 505.73467925015785
+    },
+    {
+      "size": 55,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.21258975669889082
+    },
+    {
+      "size": 56,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 56,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.3701390569507172
+    },
+    {
+      "size": 56,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.28204684329337704
+    },
+    {
+      "size": 56,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 48.74544072640572
+    },
+    {
+      "size": 56,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.381489736509628
+    },
+    {
+      "size": 56,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0480834942040376
+    },
+    {
+      "size": 56,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 874.3725834245545
+    },
+    {
+      "size": 56,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.2954191557335416
+    },
+    {
+      "size": 63,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 63,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.3956615479443273
+    },
+    {
+      "size": 63,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.2847677068501474
+    },
+    {
+      "size": 63,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 48.75418913530185
+    },
+    {
+      "size": 63,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.3940813764286033
+    },
+    {
+      "size": 63,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0544941604620406
+    },
+    {
+      "size": 63,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 874.3764637129451
+    },
+    {
+      "size": 63,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.30478634862538145
+    },
+    {
+      "size": 64,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 64,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.4106227479641194
+    },
+    {
+      "size": 64,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.29608430272230546
+    },
+    {
+      "size": 64,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 50.23114332792142
+    },
+    {
+      "size": 64,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.3749646611129873
+    },
+    {
+      "size": 64,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0218814520151338
+    },
+    {
+      "size": 64,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 891.3305283782171
+    },
+    {
+      "size": 64,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.2280244721291344
+    },
+    {
+      "size": 65,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 65,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.411872745393354
+    },
+    {
+      "size": 65,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.3200692713768699
+    },
+    {
+      "size": 65,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 95.20187124281138
+    },
+    {
+      "size": 65,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 3.052519876929145
+    },
+    {
+      "size": 65,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0238628800035685
+    },
+    {
+      "size": 65,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 897.0743789816956
+    },
+    {
+      "size": 65,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.24642444184362114
+    },
+    {
+      "size": 80,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 80,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.4657124913012147
+    },
+    {
+      "size": 80,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.3045405226365344
+    },
+    {
+      "size": 80,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 92.09966595241524
+    },
+    {
+      "size": 80,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 3.07007412681755
+    },
+    {
+      "size": 80,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0309150611827405
+    },
+    {
+      "size": 80,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 905.0345827869282
+    },
+    {
+      "size": 80,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.24772947768852072
+    },
+    {
+      "size": 127,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 127,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.9571036657252638
+    },
+    {
+      "size": 127,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.36662933655887553
+    },
+    {
+      "size": 127,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 85.36079705806256
+    },
+    {
+      "size": 127,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.843207760075134
+    },
+    {
+      "size": 127,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0099661459299802
+    },
+    {
+      "size": 127,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 1224.3504011725613
+    },
+    {
+      "size": 127,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.3305989069196513
+    },
+    {
+      "size": 128,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 128,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.011843585768264
+    },
+    {
+      "size": 128,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.36142699320506966
+    },
+    {
+      "size": 128,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 88.16142700401323
+    },
+    {
+      "size": 128,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.8856923744784457
+    },
+    {
+      "size": 128,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0230768345331207
+    },
+    {
+      "size": 128,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 1231.0804310576689
+    },
+    {
+      "size": 128,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.30775657053939925
+    },
+    {
+      "size": 256,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 256,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.8850366527065674
+    },
+    {
+      "size": 256,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.45168095315639945
+    },
+    {
+      "size": 256,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 71.96561107103906
+    },
+    {
+      "size": 256,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 2.603049213038765
+    },
+    {
+      "size": 256,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.023051483872635
+    },
+    {
+      "size": 256,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 1758.5110221125883
+    },
+    {
+      "size": 256,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.4266296600777967
+    },
+    {
+      "size": 1024,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 1024,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 5.259309206948653
+    },
+    {
+      "size": 1024,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.7091958426936524
+    },
+    {
+      "size": 1024,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 42.166974895331194
+    },
+    {
+      "size": 1024,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.8460785259029553
+    },
+    {
+      "size": 1024,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0134674871848974
+    },
+    {
+      "size": 1024,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 3152.6423531663418
+    },
+    {
+      "size": 1024,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.7562292874777413
+    },
+    {
+      "size": 4096,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 4096,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 6.984463193036985
+    },
+    {
+      "size": 4096,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.9023908410811664
+    },
+    {
+      "size": 4096,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 51.4950286629851
+    },
+    {
+      "size": 4096,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.6398242433652137
+    },
+    {
+      "size": 4096,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0327653492495446
+    },
+    {
+      "size": 4096,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 4154.020781478936
+    },
+    {
+      "size": 4096,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.991568732085112
+    },
+    {
+      "size": 65536,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 65536,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 7.898944617505989
+    },
+    {
+      "size": 65536,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.9924522291034453
+    },
+    {
+      "size": 65536,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 3.8180359309289784
+    },
+    {
+      "size": 65536,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0449178044033094
+    },
+    {
+      "size": 65536,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.000677700748738
+    },
+    {
+      "size": 65536,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 4625.941874049218
+    },
+    {
+      "size": 65536,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.1182095931323988
+    },
+    {
+      "size": 1048576,
+      "impl": "c-openssl",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0
+    },
+    {
+      "size": 1048576,
+      "impl": "c-ref",
+      "baseline": "c-openssl",
+      "ratio_ns": 8.005835838455376
+    },
+    {
+      "size": 1048576,
+      "impl": "go-stdlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.9991751417062723
+    },
+    {
+      "size": 1048576,
+      "impl": "java-jdk",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.3989666758721486
+    },
+    {
+      "size": 1048576,
+      "impl": "node-crypto",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.0097794477572213
+    },
+    {
+      "size": 1048576,
+      "impl": "python-hashlib",
+      "baseline": "c-openssl",
+      "ratio_ns": 0.9997662750511118
+    },
+    {
+      "size": 1048576,
+      "impl": "python-pure",
+      "baseline": "c-openssl",
+      "ratio_ns": 4552.45202509298
+    },
+    {
+      "size": 1048576,
+      "impl": "rust-sha2",
+      "baseline": "c-openssl",
+      "ratio_ns": 1.1263983338315438
+    }
+  ]
+}

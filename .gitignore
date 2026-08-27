@@ -9,10 +9,12 @@ wheels/
 # Virtual environments
 .venv
 
-# Campaign outputs (keep results/sample/)
+# Campaign outputs (keep results/sample/ and results/latest/)
 results/**
 !results/sample/
 !results/sample/**
+!results/latest/
+!results/latest/**
 
 # Native / language build artifacts
 implementations/**/sha256_runner
