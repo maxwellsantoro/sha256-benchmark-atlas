@@ -129,6 +129,8 @@ jobs:
     needs: campaign
     runs-on: ubuntu-24.04
     if: always() && (needs.campaign.result == 'success' || needs.campaign.result == 'failure')
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -146,22 +148,29 @@ jobs:
           merge-multiple: false
 
       - name: Sync + summarize
+        env:
+          REPS: ${{ github.event.inputs.reps || '5' }}
+          CASES: ${{ github.event.inputs.cases || '10000' }}
+          MAX_SIZE: ${{ github.event.inputs.max_size || '1048576' }}
         run: |
           uv sync
           mkdir -p results/aggregate results/latest
           find artifacts -name bench.json > /tmp/bench_list.txt || true
           if [ -s /tmp/bench_list.txt ]; then
             mapfile -t FILES < /tmp/bench_list.txt
+            BLOCKS=$(wc -l < /tmp/bench_list.txt | tr -d ' ')
             uv run sha256-atlas summarize "${FILES[@]}" -o results/aggregate/summary.json
             cp results/aggregate/summary.json results/latest/summary.json
-            printf '{"run_id":"%s","run_url":"%s","completed_at":"%s"}\n' \
+            printf '{"run_id":%s,"run_url":"%s","completed_at":"%s","blocks":%s,"shards":"0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)","reps":%s,"cases":%s,"max_size_bytes":%s}\n' \
               "${{ github.run_id }}" \
               "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
               "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              "$BLOCKS" \
+              "$REPS" "$CASES" "$MAX_SIZE" \
               > results/latest/meta.json
             {
               echo "## Campaign aggregate"
-              echo "Blocks: $(wc -l < /tmp/bench_list.txt | tr -d ' ')"
+              echo "Blocks: $BLOCKS"
               echo ""
               uv run sha256-atlas summarize "${FILES[@]}" | head -c 60000
             } >> "$GITHUB_STEP_SUMMARY"
@@ -177,3 +186,21 @@ jobs:
             results/aggregate
             results/latest
           retention-days: 30
+
+      # Keep the checked-in results/latest/ in sync with reality. Without this,
+      # the README table and results/latest/*.json only reflect whichever run
+      # someone happened to download and commit by hand (see PAIN.md).
+      # Skipped on PRs (forked PRs don't have write access to GITHUB_TOKEN,
+      # and PR branches shouldn't push to main anyway).
+      - name: Commit results/latest
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/latest
+          if git diff --cached --quiet; then
+            echo "results/latest unchanged; nothing to commit"
+          else
+            git commit -m "Update latest campaign aggregate (run ${{ github.run_id }}) [skip ci]"
+            git push origin HEAD:main
+          fi
