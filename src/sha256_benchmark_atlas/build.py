@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shlex
 import shutil
 import subprocess
@@ -36,7 +37,10 @@ def build_impl(root: Path, impl: Implementation) -> BuildResult:
                 src = _java_sources(root, impl)
             except FileNotFoundError as e:
                 return BuildResult(impl.id, False, str(e))
-            cmd = ["javac", "-d", str(out), str(src)]
+            cp_parts = [str(out)]
+            if impl.java_cp:
+                cp_parts.append(str(root / impl.java_cp))
+            cmd = ["javac", "-cp", os.pathsep.join(cp_parts), "-d", str(out), str(src)]
             r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
             if r.returncode != 0:
                 return BuildResult(impl.id, False, (r.stderr or r.stdout or "javac failed")[:500])
@@ -56,15 +60,23 @@ def build_impl(root: Path, impl: Implementation) -> BuildResult:
             path.chmod(path.stat().st_mode | 0o111)
         return BuildResult(impl.id, True, "no build step")
 
-    cmd = shlex.split(impl.build)
-    if cmd[0] == "go" and not shutil.which("go"):
+    if impl.build.startswith("bash "):
+        script = impl.build.split(" ", 1)[1]
+        cmd = ["bash", str(root / script)]
+    else:
+        cmd = shlex.split(impl.build)
+
+    tool = cmd[0]
+    if tool == "go" and not shutil.which("go"):
         return BuildResult(impl.id, False, "go toolchain not installed")
-    if cmd[0] == "cargo" and not shutil.which("cargo"):
+    if tool == "cargo" and not shutil.which("cargo"):
         return BuildResult(impl.id, False, "cargo/rustc not installed")
-    if cmd[0] == "javac" and not shutil.which("javac"):
+    if tool == "javac" and not shutil.which("javac"):
         return BuildResult(impl.id, False, "javac not installed")
-    if cmd[0] == "make" and not shutil.which("make"):
+    if tool == "make" and not shutil.which("make"):
         return BuildResult(impl.id, False, "make not installed")
+    if tool == "zig" and not shutil.which("zig"):
+        return BuildResult(impl.id, False, "zig not installed")
 
     r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
     if r.returncode != 0:

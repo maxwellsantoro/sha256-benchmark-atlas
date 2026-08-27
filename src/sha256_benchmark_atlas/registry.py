@@ -39,6 +39,10 @@ class Implementation:
     def java_main(self) -> str | None:
         return self.raw.get("java_main")
 
+    @property
+    def java_cp(self) -> str | None:
+        return self.raw.get("java_cp")
+
     def as_dict(self) -> dict[str, Any]:
         return dict(self.raw)
 

@@ -288,3 +288,51 @@ implementations:
     build: null
     binary: implementations/bun-crypto/sha256_runner.js
     interpreter: bun
+
+  - id: zig-std
+    language: zig
+    project: ziglang/zig
+    package: std.crypto.hash.sha2
+    version: "0.14"
+    source_commit: null
+    implementation_class: native
+    backend: zig-stdlib
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: Zig standard library Sha256.
+    build: zig build --build-file implementations/zig-std/build.zig -Doptimize=ReleaseFast
+    binary: implementations/zig-std/zig-out/bin/sha256_runner
+
+  - id: rust-sodium
+    language: rust
+    project: sodiumoxide/sodiumoxide
+    package: sodiumoxide
+    version: "0.2"
+    source_commit: null
+    implementation_class: production
+    backend: libsodium
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: Rust sodiumoxide crate wrapping libsodium (same backend as c-libsodium).
+    build: cargo build --release --manifest-path implementations/rust-sodium/Cargo.toml
+    binary: implementations/rust-sodium/target/release/sha256_runner
+
+  - id: java-bouncycastle
+    language: java
+    project: bcgit/bc-java
+    package: bcprov-jdk18on
+    version: "1.78"
+    source_commit: null
+    implementation_class: native
+    backend: bouncycastle
+    hardware_acceleration: portable
+    status: admitted
+    leaderboards: [production, native, portable]
+    notes: Bouncy Castle JCE provider SHA-256 (pure Java).
+    build: bash implementations/java-bouncycastle/build.sh
+    binary: implementations/java-bouncycastle/out
+    java_cp: implementations/java-bouncycastle/bcprov.jar
+    interpreter: java
+    java_main: Sha256Runner

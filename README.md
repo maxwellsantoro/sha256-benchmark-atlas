@@ -100,7 +100,7 @@ At 1 MiB, **go-stdlib**, **python-hashlib**, **c-openssl**, and **node-crypto*
 2. Register it in `registry/implementations.yaml` with provenance, backend, and status
 3. Open a PR — CI builds, verifies, and benches it interleaved with the rest
 
-Currently admitted: **16** implementations across C, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, and Java — spanning OpenSSL, BoringSSL, libsodium, mbedTLS, ring, RustCrypto, Go stdlib, and reference paths.
+Currently admitted: **19** implementations across C, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, Java, and Zig — spanning OpenSSL, BoringSSL, libsodium, mbedTLS, ring, RustCrypto, Bouncy Castle, Go stdlib, Zig stdlib, and reference paths.
 
 ## Claims this repo will and will not make
 

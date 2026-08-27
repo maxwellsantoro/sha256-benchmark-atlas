@@ -19,7 +19,10 @@ results/**
 # Native / language build artifacts
 implementations/**/sha256_runner
 implementations/**/target/
+implementations/**/zig-out/
 implementations/java-jdk/out/
+implementations/java-bouncycastle/out/
+implementations/java-bouncycastle/bcprov.jar
 implementations/**/*.class
 
 # Editor / OS

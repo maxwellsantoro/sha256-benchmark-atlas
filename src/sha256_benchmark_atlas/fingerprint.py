@@ -69,6 +69,7 @@ def collect_fingerprint() -> dict[str, Any]:
         "ruby": ["ruby", "--version"],
         "php": ["php", "--version"],
         "bun": ["bun", "--version"],
+        "zig": ["zig", "version"],
     }
     for name, cmd in tool_cmds.items():
         if shutil.which(cmd[0]) is None:

@@ -16,7 +16,6 @@ on:
         description: Max message size (bytes)
         default: "1048576"
   schedule:
-    # Weekly reproducibility campaign
     - cron: "17 6 * * 1"
 
 concurrency:
@@ -30,8 +29,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Each matrix cell is an independent experimental block (same VM for all impls).
-        # Free public repos: up to 20 concurrent standard jobs.
         os: [ubuntu-24.04]
         shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         include:
@@ -42,25 +39,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Environment fingerprint (raw)
-        run: |
-          set +e
-          echo "== uname"; uname -a
-          echo "== lscpu"; lscpu
-          echo "== cpuinfo model/flags"
-          grep -E 'model name|flags' /proc/cpuinfo | head -n 20
-          echo "== free"; free -h
-          echo "== openssl"; openssl version
-          echo "== cc"; cc --version | head -n 1
-          echo "== rustc"; rustc --version
-          echo "== go"; go version
-          echo "== node"; node --version
-          echo "== java"; java -version
-          echo "== python"; python3 --version
-          echo "== ruby"; ruby --version
-          echo "== php"; php --version
-          echo "== bun"; bun --version
 
       - uses: actions/setup-python@v5
         with:
@@ -94,8 +72,33 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
+      - uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.14.0
+
       - name: Install native crypto libraries
         run: sudo apt-get update && sudo apt-get install -y libssl-dev libsodium-dev libmbedtls-dev
+
+      - name: Environment fingerprint (raw)
+        run: |
+          set +e
+          echo "== uname"; uname -a
+          echo "== lscpu"; lscpu
+          echo "== cpuinfo model/flags"
+          grep -E 'model name|flags' /proc/cpuinfo | head -n 20 || true
+          echo "== free"; free -h
+          echo "== openssl"; openssl version
+          echo "== cc"; cc --version | head -n 1
+          echo "== rustc"; rustc --version
+          echo "== go"; go version
+          echo "== node"; node --version
+          echo "== java"; java -version
+          echo "== python"; python3 --version
+          echo "== ruby"; ruby --version
+          echo "== php"; php --version
+          echo "== bun"; bun --version
+          echo "== zig"; zig version
+          true
 
       - name: Sync harness
         run: uv sync
@@ -125,7 +128,7 @@ jobs:
     name: aggregate
     needs: campaign
     runs-on: ubuntu-24.04
-    if: always()
+    if: always() && (needs.campaign.result == 'success' || needs.campaign.result == 'failure')
     steps:
       - uses: actions/checkout@v4
 
@@ -145,13 +148,23 @@ jobs:
       - name: Sync + summarize
         run: |
           uv sync
-          mkdir -p results/aggregate
+          mkdir -p results/aggregate results/latest
           find artifacts -name bench.json > /tmp/bench_list.txt || true
           if [ -s /tmp/bench_list.txt ]; then
             mapfile -t FILES < /tmp/bench_list.txt
             uv run sha256-atlas summarize "${FILES[@]}" -o results/aggregate/summary.json
-            cp results/aggregate/summary.json "$GITHUB_STEP_SUMMARY" 2>/dev/null || \
-              uv run sha256-atlas summarize "${FILES[@]}" >> "$GITHUB_STEP_SUMMARY"
+            cp results/aggregate/summary.json results/latest/summary.json
+            printf '{"run_id":"%s","run_url":"%s","completed_at":"%s"}\n' \
+              "${{ github.run_id }}" \
+              "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+              "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              > results/latest/meta.json
+            {
+              echo "## Campaign aggregate"
+              echo "Blocks: $(wc -l < /tmp/bench_list.txt | tr -d ' ')"
+              echo ""
+              uv run sha256-atlas summarize "${FILES[@]}" | head -c 60000
+            } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "No bench.json artifacts found" >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -160,5 +173,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: aggregate-summary
-          path: results/aggregate
+          path: |
+            results/aggregate
+            results/latest
           retention-days: 30
