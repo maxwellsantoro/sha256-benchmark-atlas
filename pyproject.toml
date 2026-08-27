@@ -17,7 +17,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.9",
+    "pytest>=8.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [project.scripts]
 sha256-atlas = "sha256_benchmark_atlas.cli:main"
