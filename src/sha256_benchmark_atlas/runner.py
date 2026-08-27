@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import struct
 import subprocess
 import sys
@@ -11,11 +12,18 @@ from .registry import Implementation
 
 def runner_argv(root: Path, impl: Implementation) -> list[str]:
     binary = root / impl.binary
-    if impl.interpreter == "python":
+    interpreter = impl.interpreter
+    if interpreter == "python":
         return [sys.executable, str(binary)]
-    if impl.interpreter == "node":
+    if interpreter == "node":
         return ["node", str(binary)]
-    if impl.interpreter == "java":
+    if interpreter == "ruby":
+        return ["ruby", str(binary)]
+    if interpreter == "php":
+        return ["php", str(binary)]
+    if interpreter == "bun":
+        return ["bun", str(binary)]
+    if interpreter == "java":
         main = impl.java_main or "Sha256Runner"
         return ["java", "-cp", str(binary), main]
     return [str(binary)]
@@ -48,6 +56,9 @@ def verify_batch(
         payload.extend(struct.pack(">I", len(msg)))
         payload.extend(msg)
     cmd = runner_argv(root, impl) + ["verify"]
+    # Pure-Python correctness can be very slow at scale.
+    if impl.raw.get("slow"):
+        timeout = max(timeout, 3600.0)
     r = subprocess.run(
         cmd,
         input=bytes(payload),
@@ -74,6 +85,8 @@ def bench_once(
     seed: int,
     timeout: float = 600.0,
 ) -> dict:
+    if impl.raw.get("slow"):
+        timeout = max(timeout, 3600.0)
     cmd = runner_argv(root, impl) + ["bench", str(size), str(iters), str(seed)]
     r = subprocess.run(cmd, capture_output=True, timeout=timeout, check=False, text=True)
     if r.returncode != 0:

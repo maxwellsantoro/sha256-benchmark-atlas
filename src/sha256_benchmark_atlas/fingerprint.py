@@ -66,6 +66,9 @@ def collect_fingerprint() -> dict[str, Any]:
         "javac": ["javac", "-version"],
         "openssl": ["openssl", "version"],
         "python": ["python3", "--version"],
+        "ruby": ["ruby", "--version"],
+        "php": ["php", "--version"],
+        "bun": ["bun", "--version"],
     }
     for name, cmd in tool_cmds.items():
         if shutil.which(cmd[0]) is None:

@@ -58,6 +58,9 @@ jobs:
           echo "== node"; node --version
           echo "== java"; java -version
           echo "== python"; python3 --version
+          echo "== ruby"; ruby --version
+          echo "== php"; php --version
+          echo "== bun"; bun --version
 
       - uses: actions/setup-python@v5
         with:
@@ -80,8 +83,19 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install OpenSSL headers
-        run: sudo apt-get update && sudo apt-get install -y libssl-dev
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: gmp
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install native crypto libraries
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev libsodium-dev libmbedtls-dev
 
       - name: Sync harness
         run: uv sync

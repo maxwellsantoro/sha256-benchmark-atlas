@@ -96,9 +96,11 @@ At 1 MiB, **go-stdlib**, **python-hashlib**, **c-openssl**, and **node-crypto*
 
 ## Adding an implementation
 
-1. Add a runner under `implementations/<id>/` obeying the CLI contract  
-2. Register it in `registry/implementations.yaml` with provenance + status  
-3. Open a PR — CI will build, verify, and bench it interleaved with the rest  
+1. Add a runner under `implementations/<id>/` obeying the CLI contract (`hash`, `verify`, `bench`)
+2. Register it in `registry/implementations.yaml` with provenance, backend, and status
+3. Open a PR — CI builds, verifies, and benches it interleaved with the rest
+
+Currently admitted: **16** implementations across C, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, and Java — spanning OpenSSL, BoringSSL, libsodium, mbedTLS, ring, RustCrypto, Go stdlib, and reference paths.
 
 ## Claims this repo will and will not make
 

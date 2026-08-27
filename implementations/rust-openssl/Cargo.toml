@@ -1,0 +1,11 @@
+[package]
+name = "sha256_runner"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+openssl = "0.10"
+
+[[bin]]
+name = "sha256_runner"
+path = "src/main.rs"

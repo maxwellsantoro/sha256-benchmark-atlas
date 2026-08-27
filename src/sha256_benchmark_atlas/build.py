@@ -8,6 +8,8 @@ from pathlib import Path
 
 from .registry import Implementation, load_registry
 
+SCRIPT_INTERPRETERS = {"python", "node", "ruby", "php", "bun"}
+
 
 @dataclass
 class BuildResult:
@@ -16,26 +18,44 @@ class BuildResult:
     detail: str
 
 
+def _java_sources(root: Path, impl: Implementation) -> Path:
+    impl_dir = root / "implementations" / impl.id
+    for name in ("Sha256Runner.java", "sha256_runner.java"):
+        candidate = impl_dir / name
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError(f"no Java source under implementations/{impl.id}")
+
+
 def build_impl(root: Path, impl: Implementation) -> BuildResult:
     if not impl.build:
-        # Interpreted runners: ensure executable bit / compile java handled by command
         if impl.interpreter == "java":
             out = root / impl.binary
             out.mkdir(parents=True, exist_ok=True)
-            src = root / "implementations" / "java-jdk" / "Sha256Runner.java"
+            try:
+                src = _java_sources(root, impl)
+            except FileNotFoundError as e:
+                return BuildResult(impl.id, False, str(e))
             cmd = ["javac", "-d", str(out), str(src)]
             r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
             if r.returncode != 0:
                 return BuildResult(impl.id, False, (r.stderr or r.stdout or "javac failed")[:500])
             return BuildResult(impl.id, True, "javac ok")
+
+        if impl.interpreter == "ruby" and not shutil.which("ruby"):
+            return BuildResult(impl.id, False, "ruby not installed")
+        if impl.interpreter == "php" and not shutil.which("php"):
+            return BuildResult(impl.id, False, "php not installed")
+        if impl.interpreter == "bun" and not shutil.which("bun"):
+            return BuildResult(impl.id, False, "bun not installed")
+
         path = root / impl.binary
         if not path.exists():
             return BuildResult(impl.id, False, f"missing {impl.binary}")
-        if impl.interpreter in {"python", "node"}:
+        if impl.interpreter in SCRIPT_INTERPRETERS:
             path.chmod(path.stat().st_mode | 0o111)
         return BuildResult(impl.id, True, "no build step")
 
-    # Rewrite relative paths in build to run from root
     cmd = shlex.split(impl.build)
     if cmd[0] == "go" and not shutil.which("go"):
         return BuildResult(impl.id, False, "go toolchain not installed")
@@ -43,6 +63,8 @@ def build_impl(root: Path, impl: Implementation) -> BuildResult:
         return BuildResult(impl.id, False, "cargo/rustc not installed")
     if cmd[0] == "javac" and not shutil.which("javac"):
         return BuildResult(impl.id, False, "javac not installed")
+    if cmd[0] == "make" and not shutil.which("make"):
+        return BuildResult(impl.id, False, "make not installed")
 
     r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
     if r.returncode != 0:

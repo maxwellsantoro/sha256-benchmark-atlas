@@ -164,3 +164,127 @@ implementations:
     binary: implementations/java-jdk/out
     interpreter: java
     java_main: Sha256Runner
+
+  - id: rust-ring
+    language: rust
+    project: briansmith/ring
+    package: ring
+    version: "0.17"
+    source_commit: null
+    implementation_class: native
+    backend: ring
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: ring crate SHA-256; distinct from RustCrypto sha2.
+    build: cargo build --release --manifest-path implementations/rust-ring/Cargo.toml
+    binary: implementations/rust-ring/target/release/sha256_runner
+
+  - id: rust-openssl
+    language: rust
+    project: sfackler/rust-openssl
+    package: openssl
+    version: "0.10"
+    source_commit: null
+    implementation_class: production
+    backend: openssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: Rust openssl crate wrapping libcrypto SHA-256.
+    build: cargo build --release --manifest-path implementations/rust-openssl/Cargo.toml
+    binary: implementations/rust-openssl/target/release/sha256_runner
+
+  - id: c-libsodium
+    language: c
+    project: jedisct1/libsodium
+    package: libsodium
+    version: system
+    source_commit: null
+    implementation_class: production
+    backend: libsodium
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: crypto_hash_sha256 from libsodium.
+    build: make -C implementations/c-libsodium
+    binary: implementations/c-libsodium/sha256_runner
+
+  - id: c-mbedtls
+    language: c
+    project: Mbed-TLS/mbedtls
+    package: mbedcrypto
+    version: system
+    source_commit: null
+    implementation_class: native
+    backend: mbedtls
+    hardware_acceleration: portable
+    status: admitted
+    leaderboards: [production, native, portable]
+    notes: mbedTLS software SHA-256 (no OpenSSL).
+    build: make -C implementations/c-mbedtls
+    binary: implementations/c-mbedtls/sha256_runner
+
+  - id: ruby-openssl
+    language: ruby
+    project: ruby/openssl
+    package: openssl
+    version: runtime
+    source_commit: null
+    implementation_class: production
+    backend: openssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: OpenSSL::Digest SHA-256 via CRuby openssl extension.
+    build: null
+    binary: implementations/ruby-openssl/sha256_runner.rb
+    interpreter: ruby
+
+  - id: php-hash
+    language: php
+    project: php/php-src
+    package: hash
+    version: runtime
+    source_commit: null
+    implementation_class: production
+    backend: php-hash-ext
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: PHP hash('sha256') — backend varies by build (often OpenSSL).
+    build: null
+    binary: implementations/php-hash/sha256_runner.php
+    interpreter: php
+
+  - id: python-cryptography
+    language: python
+    project: pyca/cryptography
+    package: cryptography
+    version: runtime
+    source_commit: null
+    implementation_class: production
+    backend: openssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: cryptography.hazmat SHA-256 (OpenSSL-backed on typical Linux builds).
+    build: null
+    binary: implementations/python-cryptography/sha256_runner.py
+    interpreter: python
+
+  - id: bun-crypto
+    language: javascript
+    project: oven-sh/bun
+    package: bun:crypto
+    version: runtime
+    source_commit: null
+    implementation_class: production
+    backend: boringssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: Bun crypto.createHash — BoringSSL-backed, distinct from Node/OpenSSL path.
+    build: null
+    binary: implementations/bun-crypto/sha256_runner.js
+    interpreter: bun

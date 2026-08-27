@@ -62,3 +62,6 @@ should cite entries from this list.
 6. **Per-case process spawn** — initial correctness gate was unusable at 10k cases; added length-prefixed batch `verify`.
 7. **macOS Java stubs** — `/usr/bin/java` exists but needs a real JDK on PATH (Homebrew OpenJDK).
 8. **Slow pure-language benches** — registry `slow: true` with reduced iters; otherwise pure Python dominates wall clock.
+9. **mbedTLS version split** — PSA `psa_hash_compute` used so runner works on Ubuntu 3.x and Homebrew 4.x.
+10. **PHP 64-bit PRNG** — bench fill uses GMP; CI needs `php-gmp` extension.
+11. **Native lib discovery** — C Makefiles use `pkg-config` (libsodium, mbedcrypto) like OpenSSL.
