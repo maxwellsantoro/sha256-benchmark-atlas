@@ -20,6 +20,7 @@ results/**
 implementations/**/sha256_runner
 implementations/**/target/
 implementations/**/zig-out/
+implementations/**/.zig-cache/
 implementations/java-jdk/out/
 implementations/java-bouncycastle/out/
 implementations/java-bouncycastle/bcprov.jar
