@@ -1,0 +1,150 @@
+name: SHA-256 campaign
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      reps:
+        description: Interleaved repetitions per size
+        default: "5"
+      cases:
+        description: PRNG correctness cases
+        default: "10000"
+      max_size:
+        description: Max message size (bytes)
+        default: "1048576"
+  schedule:
+    # Weekly reproducibility campaign
+    - cron: "17 6 * * 1"
+
+concurrency:
+  group: sha256-campaign-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  campaign:
+    name: block-${{ matrix.shard }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each matrix cell is an independent experimental block (same VM for all impls).
+        # Free public repos: up to 20 concurrent standard jobs.
+        os: [ubuntu-24.04]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        include:
+          - os: ubuntu-24.04-arm
+            shard: 10
+          - os: ubuntu-24.04-arm
+            shard: 11
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment fingerprint (raw)
+        run: |
+          set +e
+          echo "== uname"; uname -a
+          echo "== lscpu"; lscpu
+          echo "== cpuinfo model/flags"
+          grep -E 'model name|flags' /proc/cpuinfo | head -n 20
+          echo "== free"; free -h
+          echo "== openssl"; openssl version
+          echo "== cc"; cc --version | head -n 1
+          echo "== rustc"; rustc --version
+          echo "== go"; go version
+          echo "== node"; node --version
+          echo "== java"; java -version
+          echo "== python"; python3 --version
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install OpenSSL headers
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev
+
+      - name: Sync harness
+        run: uv sync
+
+      - name: Run campaign
+        env:
+          REPS: ${{ github.event.inputs.reps || '5' }}
+          CASES: ${{ github.event.inputs.cases || '10000' }}
+          MAX_SIZE: ${{ github.event.inputs.max_size || '1048576' }}
+        run: |
+          uv run sha256-atlas campaign \
+            --reps "$REPS" \
+            --cases "$CASES" \
+            --max-size "$MAX_SIZE" \
+            --shard "${{ matrix.shard }}" \
+            --shards 12 \
+            --output-dir "results/gha-${{ github.run_id }}-shard${{ matrix.shard }}"
+
+      - name: Upload block results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-shard-${{ matrix.shard }}-${{ matrix.os }}
+          path: results/gha-${{ github.run_id }}-shard${{ matrix.shard }}
+          retention-days: 30
+
+  aggregate:
+    name: aggregate
+    needs: campaign
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Download all shards
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: results-shard-*
+          merge-multiple: false
+
+      - name: Sync + summarize
+        run: |
+          uv sync
+          mkdir -p results/aggregate
+          find artifacts -name bench.json > /tmp/bench_list.txt || true
+          if [ -s /tmp/bench_list.txt ]; then
+            mapfile -t FILES < /tmp/bench_list.txt
+            uv run sha256-atlas summarize "${FILES[@]}" -o results/aggregate/summary.json
+            cp results/aggregate/summary.json "$GITHUB_STEP_SUMMARY" 2>/dev/null || \
+              uv run sha256-atlas summarize "${FILES[@]}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No bench.json artifacts found" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: aggregate-summary
+          path: results/aggregate
+          retention-days: 30

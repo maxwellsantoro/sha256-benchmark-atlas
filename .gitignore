@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Campaign outputs (keep results/sample/)
+results/**
+!results/sample/
+!results/sample/**
+
+# Native / language build artifacts
+implementations/**/sha256_runner
+implementations/**/target/
+implementations/java-jdk/out/
+implementations/**/*.class
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

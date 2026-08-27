@@ -1,0 +1,166 @@
+# SHA-256 Benchmark Atlas — implementation registry
+# Status: DISCOVERED | ADMITTED | EXCLUDED | BROKEN | DUPLICATE_BACKEND | UNSUPPORTED_PLATFORM
+#
+# Provenance model:
+#   language interface → library → implementation → backend → CPU path
+
+schema_version: 1
+
+message_sizes_bytes:
+  - 0
+  - 1
+  - 3
+  - 32
+  - 55
+  - 56
+  - 63
+  - 64
+  - 65
+  - 80
+  - 127
+  - 128
+  - 256
+  - 1024
+  - 4096
+  - 65536
+  - 1048576
+  - 16777216
+
+leaderboards:
+  - id: production
+    description: Fastest normal SHA-256 API a programmer would reasonably use (native libs / CPU accel allowed)
+  - id: native
+    description: Implementations belonging to the ecosystem rather than wrapping a foreign crypto library
+  - id: portable
+    description: No SHA extensions or architecture-specific assembly
+  - id: pure-language
+    description: Implemented predominantly in the named language
+  - id: reference
+    description: Straightforward pedagogical implementations of the SHA-256 algorithm
+
+implementations:
+  - id: c-openssl
+    language: c
+    project: openssl/openssl
+    package: libcrypto
+    version: system
+    source_commit: null
+    implementation_class: production
+    backend: openssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: Direct OpenSSL EVP SHA-256; often the backend behind many language wrappers.
+    build: make -C implementations/c-openssl
+    binary: implementations/c-openssl/sha256_runner
+
+  - id: c-ref
+    language: c
+    project: local/reference
+    package: null
+    version: "1.0"
+    source_commit: null
+    implementation_class: reference
+    backend: reference-c
+    hardware_acceleration: none
+    status: admitted
+    leaderboards: [portable, pure-language, reference]
+    notes: Compact portable C reference (FIPS 180-4 style). No SIMD / SHA-NI.
+    build: make -C implementations/c-ref
+    binary: implementations/c-ref/sha256_runner
+
+  - id: rust-sha2
+    language: rust
+    project: RustCrypto/hashes
+    package: sha2
+    version: "0.10"
+    source_commit: null
+    implementation_class: native
+    backend: rustcrypto
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: RustCrypto sha2 crate; may dispatch to SHA-NI / asm where available.
+    build: cargo build --release --manifest-path implementations/rust-sha2/Cargo.toml
+    binary: implementations/rust-sha2/target/release/sha256_runner
+
+  - id: go-stdlib
+    language: go
+    project: golang/go
+    package: crypto/sha256
+    version: go-toolchain
+    source_commit: null
+    implementation_class: native
+    backend: go-stdlib
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: Go standard library crypto/sha256 with arch-specific assembly paths.
+    build: go build -C implementations/go-stdlib -o sha256_runner .
+    binary: implementations/go-stdlib/sha256_runner
+
+  - id: python-hashlib
+    language: python
+    project: python/cpython
+    package: hashlib
+    version: runtime
+    source_commit: null
+    implementation_class: production
+    backend: openssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: CPython hashlib.sha256 — typically OpenSSL-backed on modern builds.
+    build: null
+    binary: implementations/python-hashlib/sha256_runner.py
+    interpreter: python
+
+  - id: python-pure
+    language: python
+    project: local/pure
+    package: null
+    version: "1.0"
+    source_commit: null
+    implementation_class: pure-language
+    backend: pure-python
+    hardware_acceleration: none
+    status: admitted
+    leaderboards: [pure-language, portable, reference]
+    notes: Pure-Python SHA-256 for abstraction-boundary contrast vs hashlib.
+    slow: true
+    build: null
+    binary: implementations/python-pure/sha256_runner.py
+    interpreter: python
+
+  - id: node-crypto
+    language: javascript
+    project: nodejs/node
+    package: node:crypto
+    version: runtime
+    source_commit: null
+    implementation_class: production
+    backend: openssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: Node.js crypto.createHash('sha256') — OpenSSL wrapper.
+    build: null
+    binary: implementations/node-crypto/sha256_runner.js
+    interpreter: node
+
+  - id: java-jdk
+    language: java
+    project: openjdk
+    package: java.security.MessageDigest
+    version: runtime
+    source_commit: null
+    implementation_class: native
+    backend: jdk-provider
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: JDK MessageDigest.getInstance("SHA-256") default provider.
+    build: javac -d implementations/java-jdk/out implementations/java-jdk/Sha256Runner.java
+    binary: implementations/java-jdk/out
+    interpreter: java
+    java_main: Sha256Runner
