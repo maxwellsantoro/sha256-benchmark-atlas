@@ -22,17 +22,27 @@ public class Sha256Runner {
         return buf;
     }
 
-    static String digestHex(byte[] data) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
+    static MessageDigest newDigest() throws Exception {
+        return MessageDigest.getInstance("SHA-256");
+    }
+
+    // Reuses one MessageDigest via reset() instead of calling getInstance() per
+    // hash. getInstance() does a Security-provider registry lookup that costs
+    // far more than SHA-256 itself on small inputs; calling it inside a timed
+    // loop measures provider resolution, not the digest (see PAIN.md's
+    // "process startup must stay outside the timed region").
+    static String digestHex(MessageDigest md, byte[] data) {
+        md.reset();
         return toHex(md.digest(data));
     }
 
     static void cmdHash() throws Exception {
         byte[] data = System.in.readAllBytes();
-        System.out.println(digestHex(data));
+        System.out.println(digestHex(newDigest(), data));
     }
 
     static void cmdVerify() throws Exception {
+        MessageDigest md = newDigest();
         DataInputStream in = new DataInputStream(System.in);
         try {
             while (true) {
@@ -44,7 +54,7 @@ public class Sha256Runner {
                 }
                 byte[] buf = new byte[len];
                 in.readFully(buf);
-                System.out.println(digestHex(buf));
+                System.out.println(digestHex(md, buf));
                 System.out.flush();
             }
         } finally {
@@ -53,11 +63,12 @@ public class Sha256Runner {
     }
 
     static void cmdBench(int size, long iters, long seed) throws Exception {
+        MessageDigest md = newDigest();
         byte[] buf = fillBuf(size, seed);
-        String last = digestHex(buf);
-        for (int i = 0; i < 3; i++) last = digestHex(buf);
+        String last = digestHex(md, buf);
+        for (int i = 0; i < 3; i++) last = digestHex(md, buf);
         long t0 = System.nanoTime();
-        for (long i = 0; i < iters; i++) last = digestHex(buf);
+        for (long i = 0; i < iters; i++) last = digestHex(md, buf);
         long ns = System.nanoTime() - t0;
         System.out.println(
             "{\"ns_total\":" + ns + ",\"hashes\":" + iters + ",\"size\":" + size

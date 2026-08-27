@@ -41,7 +41,7 @@ def build_impl(root: Path, impl: Implementation) -> BuildResult:
             if impl.java_cp:
                 cp_parts.append(str(root / impl.java_cp))
             cmd = ["javac", "-cp", os.pathsep.join(cp_parts), "-d", str(out), str(src)]
-            r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
+            r = subprocess.run(cmd, cwd=root, capture_output=True, text=True, check=False)
             if r.returncode != 0:
                 return BuildResult(impl.id, False, (r.stderr or r.stdout or "javac failed")[:500])
             return BuildResult(impl.id, True, "javac ok")
@@ -78,7 +78,7 @@ def build_impl(root: Path, impl: Implementation) -> BuildResult:
     if tool == "zig" and not shutil.which("zig"):
         return BuildResult(impl.id, False, "zig not installed")
 
-    r = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
+    r = subprocess.run(cmd, cwd=root, capture_output=True, text=True, check=False)
     if r.returncode != 0:
         detail = (r.stderr or r.stdout or "build failed").strip()[:800]
         return BuildResult(impl.id, False, detail)

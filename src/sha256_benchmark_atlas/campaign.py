@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .bench import run_interleaved_bench
@@ -23,7 +23,7 @@ def run_campaign(
     shard: int = 0,
     shards: int = 1,
 ) -> int:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     out = output_dir or (root / "results" / f"campaign-{stamp}-shard{shard}")
     out.mkdir(parents=True, exist_ok=True)
 
