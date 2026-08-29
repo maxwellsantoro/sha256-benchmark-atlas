@@ -175,9 +175,7 @@ def _probe_artifact(command: str) -> Path | None:
     if not argv:
         return None
     try:
-        r = subprocess.run(
-            argv, check=False, capture_output=True, text=True, timeout=60
-        )
+        r = subprocess.run(argv, check=False, capture_output=True, text=True, timeout=60)
     except (OSError, subprocess.TimeoutExpired):
         return None
     out = (r.stdout or "").strip().splitlines()
@@ -219,13 +217,10 @@ def audit_implementation(
         reason = None
     else:
         present = None
-        reason = (
-            impl.raw.get("audit_note")
-            or (
-                "no audit_artifact_cmd in the registry, or the probe found nothing"
-                if impl.interpreter is not None
-                else "no artifact could be disassembled (is it built?)"
-            )
+        reason = impl.raw.get("audit_note") or (
+            "no audit_artifact_cmd in the registry, or the probe found nothing"
+            if impl.interpreter is not None
+            else "no artifact could be disassembled (is it built?)"
         )
 
     return {

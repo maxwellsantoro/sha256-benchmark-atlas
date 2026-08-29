@@ -211,9 +211,7 @@ def aggregate_models(models: list[CostModel]) -> dict[str, Any] | None:
         # otherwise exact. Large values here are a not-at-steady-state signal.
         "steady_state_residual": abs(ss),
         "steady_state_residual_size": ss_size,
-        "steady_state_residual_worst_block": max(
-            m.steady_state_residual for m in models
-        ),
+        "steady_state_residual_worst_block": max(m.steady_state_residual for m in models),
         "reached_steady_state": abs(ss) <= RESIDUAL_FLAG,
         "residuals_by_size": {str(k): v for k, v in median_residuals.items()},
         "slope_fit_sizes": models[0].slope_fit_sizes,

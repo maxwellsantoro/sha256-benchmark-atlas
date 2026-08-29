@@ -22,7 +22,9 @@ harness via            `uv run sha256-atlas ...`
 results/latest/blocks/ raw per-block observations + fingerprint + capability audit
 results/latest/        summary.json derived from those blocks
 analysis/              summarization helpers
-.github/workflows/     multi-shard GitHub Actions experimental blocks
+.github/workflows/     CI (pytest/ruff) + multi-shard campaign blocks
+AGENTS.md              agent/contributor orientation
+CHANGELOG.md           release notes
 ```
 
 ## Runner contract

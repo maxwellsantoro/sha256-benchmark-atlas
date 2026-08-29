@@ -64,9 +64,13 @@ def run_campaign(
         prng_cases=cases,
         skip_million=skip_million,
     )
-    (out / "correctness.json").write_text(json.dumps(correctness, indent=2) + "\n", encoding="utf-8")
+    (out / "correctness.json").write_text(
+        json.dumps(correctness, indent=2) + "\n", encoding="utf-8"
+    )
     for r in correctness["implementations"]:
-        print(f"  [{'ok' if r['ok'] else 'FAIL'}] {r['id']}: checked={r['checked']} failed={r['failed']}")
+        print(
+            f"  [{'ok' if r['ok'] else 'FAIL'}] {r['id']}: checked={r['checked']} failed={r['failed']}"
+        )
     admitted = [r["id"] for r in correctness["implementations"] if r["ok"]]
     if not admitted:
         print("Correctness gate admitted nobody; skipping bench.")

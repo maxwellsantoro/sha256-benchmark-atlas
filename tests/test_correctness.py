@@ -82,13 +82,14 @@ def _impl(iid: str = "fake") -> Implementation:
 
 
 def _cases(n: int) -> list[tuple[str, bytes, str]]:
-    return [(f"case_{i}", bytes([i % 251]), hashlib.sha256(bytes([i % 251])).hexdigest()) for i in range(n)]
+    return [
+        (f"case_{i}", bytes([i % 251]), hashlib.sha256(bytes([i % 251])).hexdigest())
+        for i in range(n)
+    ]
 
 
 def _patch_verify(monkeypatch: pytest.MonkeyPatch, digests: list[str]) -> None:
-    monkeypatch.setattr(
-        correctness_mod, "verify_batch", lambda root, impl, messages: digests
-    )
+    monkeypatch.setattr(correctness_mod, "verify_batch", lambda root, impl, messages: digests)
 
 
 def test_check_impl_counts_every_failure_not_just_the_sampled_ones(

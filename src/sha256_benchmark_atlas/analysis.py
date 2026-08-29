@@ -148,11 +148,7 @@ def load_blocks(paths: list[Path]) -> list[Block]:
         data = _read_json(path)
         arch, host = _block_arch(path, data)
         audit_path = next(
-            (
-                p
-                for p in (path.parent / "audit.json", path.parent / "audit.json.gz")
-                if p.is_file()
-            ),
+            (p for p in (path.parent / "audit.json", path.parent / "audit.json.gz") if p.is_file()),
             None,
         )
         audit = None
@@ -261,9 +257,7 @@ def _check_digest_agreement(blocks: list[Block]) -> dict[str, Any]:
     }
 
 
-def _rows_for_arch(
-    blocks: list[Block], meta: RegistryMeta, arch: str
-) -> list[dict[str, Any]]:
+def _rows_for_arch(blocks: list[Block], meta: RegistryMeta, arch: str) -> list[dict[str, Any]]:
     ns: dict[tuple[str, int], list[float]] = defaultdict(list)
     gb: dict[tuple[str, int], list[float]] = defaultdict(list)
     seen_blocks: dict[tuple[str, int], set[str]] = defaultdict(set)
@@ -303,9 +297,7 @@ def _rows_for_arch(
     return rows
 
 
-def _paired_ratios(
-    blocks: list[Block], meta: RegistryMeta, arch: str
-) -> list[dict[str, Any]]:
+def _paired_ratios(blocks: list[Block], meta: RegistryMeta, arch: str) -> list[dict[str, Any]]:
     """On-machine ratios: form T_impl/T_baseline inside each block, then aggregate.
 
     This is the quantity the atlas actually claims. Dividing one pooled median by
@@ -359,9 +351,7 @@ def _paired_ratios(
     return out
 
 
-def _cost_models(
-    blocks: list[Block], meta: RegistryMeta, arch: str
-) -> list[dict[str, Any]]:
+def _cost_models(blocks: list[Block], meta: RegistryMeta, arch: str) -> list[dict[str, Any]]:
     """Split each implementation into fixed per-call cost and per-block cost.
 
     Fitted inside each block and then aggregated, for the same reason ratios are:
@@ -424,9 +414,7 @@ def _backend_clusters(
     return clusters
 
 
-def _leaderboards(
-    rows: list[dict[str, Any]], meta: RegistryMeta, arch: str
-) -> dict[str, Any]:
+def _leaderboards(rows: list[dict[str, Any]], meta: RegistryMeta, arch: str) -> dict[str, Any]:
     """Rank each registry-declared board. Previously declared and never computed."""
     out: dict[str, Any] = {}
     for board, description in sorted(meta.board_descriptions.items()):
@@ -492,8 +480,7 @@ def _arch_sensitivity(
             for impl, ratio in sorted(ratios.items()):
                 departure = ratio / cohort if cohort else None
                 flagged = departure is not None and (
-                    departure >= ARCH_SENSITIVITY_FACTOR
-                    or departure <= 1 / ARCH_SENSITIVITY_FACTOR
+                    departure >= ARCH_SENSITIVITY_FACTOR or departure <= 1 / ARCH_SENSITIVITY_FACTOR
                 )
                 if not flagged:
                     continue
@@ -615,9 +602,7 @@ def summarize_files(paths: list[Path], *, root: Path | None = None) -> dict[str,
             # Two independent methods answering the same question: does this binary
             # contain a SHA-256 datapath, and does its measured per-block cost look
             # like one? Where they disagree, one of them is wrong.
-            "audit_measurement_conflicts": (
-                cross_check(audit, cost_models) if audit else []
-            ),
+            "audit_measurement_conflicts": (cross_check(audit, cost_models) if audit else []),
             "backend_clusters": _backend_clusters(rows, meta, arch),
             "leaderboards": _leaderboards(rows, meta, arch),
             "claims": _claims(paired, arch, [m for m in models if m != "unknown"]),
@@ -666,7 +651,9 @@ def render_markdown(summary: dict[str, Any], *, top: int = 8) -> str:
     )
     for arch, s in summary["strata"].items():
         lines.append("")
-        lines.append(f"### {arch} — {', '.join(s['cpu_models']) or 'unknown CPU'} ({s['block_count']} blocks)")
+        lines.append(
+            f"### {arch} — {', '.join(s['cpu_models']) or 'unknown CPU'} ({s['block_count']} blocks)"
+        )
         for size in ("64", "1048576"):
             ranking = s["rankings_by_size"].get(size)
             if not ranking:
@@ -685,7 +672,9 @@ def render_markdown(summary: dict[str, Any], *, top: int = 8) -> str:
         if not models:
             continue
         lines.append(f"\n### {arch} — fixed cost vs per-block cost\n")
-        lines.append("| impl | a (ns/call) | b (ns/64B block) | asympt GB/s | hw path | steady state |")
+        lines.append(
+            "| impl | a (ns/call) | b (ns/64B block) | asympt GB/s | hw path | steady state |"
+        )
         lines.append("|---|---|---|---|---|---|")
         audit = {
             e["id"]: e for e in ((s.get("capability_audit") or {}).get("implementations") or [])
@@ -693,8 +682,12 @@ def render_markdown(summary: dict[str, Any], *, top: int = 8) -> str:
         for r in models:
             hw = audit.get(r["impl"], {}).get("hardware_sha256_present")
             hw_s = {True: "yes", False: "no", None: "?"}[hw]
-            ss = "ok" if r["reached_steady_state"] else (
-                f"NO ({r['steady_state_residual'] * 100:.0f}% @{r['steady_state_residual_size']}B)"
+            ss = (
+                "ok"
+                if r["reached_steady_state"]
+                else (
+                    f"NO ({r['steady_state_residual'] * 100:.0f}% @{r['steady_state_residual_size']}B)"
+                )
             )
             lines.append(
                 f"| {r['impl']} | {r['a_ns_fixed']['median']:.0f} | "

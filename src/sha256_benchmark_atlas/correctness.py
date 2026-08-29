@@ -153,11 +153,7 @@ def run_correctness(
             "implementations_agreeing": len(agreeing),
             "unanimous": len(agreeing) == len(results) and len(results) > 1,
             "distinct_backends_agreeing": sorted(
-                {
-                    str(i.backend)
-                    for i in impls
-                    if i.id in set(agreeing) and i.backend
-                }
+                {str(i.backend) for i in impls if i.id in set(agreeing) and i.backend}
             ),
         },
         "implementations": results,

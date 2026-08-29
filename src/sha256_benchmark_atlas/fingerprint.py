@@ -123,15 +123,18 @@ def collect_library_versions() -> dict[str, str | None]:
     else:
         out.update({"libcrypto": None, "libsodium": None, "mbedcrypto": None})
 
-    out["python-cryptography"] = _first_line(
-        _run(
-            [
-                "python3",
-                "-c",
-                "import cryptography; print(cryptography.__version__)",
-            ]
+    out["python-cryptography"] = (
+        _first_line(
+            _run(
+                [
+                    "python3",
+                    "-c",
+                    "import cryptography; print(cryptography.__version__)",
+                ]
+            )
         )
-    ) or None
+        or None
+    )
     if out["python-cryptography"] and (
         "Traceback" in out["python-cryptography"] or "<" in out["python-cryptography"]
     ):
@@ -289,7 +292,8 @@ def collect_fingerprint() -> dict[str, Any]:
                 features, feature_source = "", "sysctl:hw.optional.arm.FEAT_SHA256"
         else:
             features = " ".join(
-                t.lower() for t in (sysctl.get("leaf7", "") + " " + sysctl.get("features", "")).split()
+                t.lower()
+                for t in (sysctl.get("leaf7", "") + " " + sysctl.get("features", "")).split()
             )
             feature_source = "sysctl:machdep.cpu"
 

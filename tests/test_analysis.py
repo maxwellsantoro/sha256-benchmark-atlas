@@ -67,12 +67,8 @@ def _registry(tmp_path: Path, implementations: list[dict]) -> None:
 
 
 def test_blocks_are_stratified_by_architecture(tmp_path: Path) -> None:
-    x64 = _write_bench(
-        tmp_path / "r1" / "bench.json", [_obs("impl-a", 64, 100.0)], arch="x86_64"
-    )
-    arm = _write_bench(
-        tmp_path / "r2" / "bench.json", [_obs("impl-a", 64, 400.0)], arch="aarch64"
-    )
+    x64 = _write_bench(tmp_path / "r1" / "bench.json", [_obs("impl-a", 64, 100.0)], arch="x86_64")
+    arm = _write_bench(tmp_path / "r2" / "bench.json", [_obs("impl-a", 64, 400.0)], arch="aarch64")
 
     summary = summarize_files([x64, arm])
 
@@ -84,18 +80,12 @@ def test_blocks_are_stratified_by_architecture(tmp_path: Path) -> None:
 
 def test_architectures_are_never_pooled_into_one_median(tmp_path: Path) -> None:
     """The old behaviour produced 250.0 here — a number describing neither host."""
-    x64 = _write_bench(
-        tmp_path / "r1" / "bench.json", [_obs("impl-a", 64, 100.0)], arch="x86_64"
-    )
-    arm = _write_bench(
-        tmp_path / "r2" / "bench.json", [_obs("impl-a", 64, 400.0)], arch="aarch64"
-    )
+    x64 = _write_bench(tmp_path / "r1" / "bench.json", [_obs("impl-a", 64, 100.0)], arch="x86_64")
+    arm = _write_bench(tmp_path / "r2" / "bench.json", [_obs("impl-a", 64, 400.0)], arch="aarch64")
 
     summary = summarize_files([x64, arm])
 
-    medians = {
-        arch: s["rows"][0]["ns_per_hash_median"] for arch, s in summary["strata"].items()
-    }
+    medians = {arch: s["rows"][0]["ns_per_hash_median"] for arch, s in summary["strata"].items()}
     assert 250.0 not in medians.values()
     assert sorted(medians.values()) == [100.0, 400.0]
 
@@ -236,9 +226,7 @@ def test_paired_ratio_beats_pooled_ratio_under_host_variation(tmp_path: Path) ->
     ]
 
     summary = summarize_files(blocks)
-    row = next(
-        r for r in summary["strata"]["x86_64"]["paired_ratios"] if r["impl"] == "impl-x"
-    )
+    row = next(r for r in summary["strata"]["x86_64"]["paired_ratios"] if r["impl"] == "impl-x")
 
     assert row["ratio_ns_median"] == 0.9
     assert row["blocks_faster_than_baseline"] == 3
@@ -368,9 +356,7 @@ def test_backend_attribution_from_registry(tmp_path: Path) -> None:
 
 
 def test_missing_registry_is_reported_not_silently_swallowed(tmp_path: Path) -> None:
-    block = _write_bench(
-        tmp_path / "r1" / "bench.json", [_obs("mystery", 1_048_576, 100.0)]
-    )
+    block = _write_bench(tmp_path / "r1" / "bench.json", [_obs("mystery", 1_048_576, 100.0)])
 
     summary = summarize_files([block], root=None)
     assert summary["registry_metadata_available"] is False
@@ -453,8 +439,7 @@ def test_reference_arch_is_the_one_with_more_blocks(tmp_path: Path) -> None:
     blocks = [
         _write_bench(
             tmp_path / f"x{i}" / "bench.json",
-            [_obs(p, 1_048_576, ns) for p, ns in peers]
-            + [_obs("outlier", 1_048_576, 100.0)],
+            [_obs(p, 1_048_576, ns) for p, ns in peers] + [_obs("outlier", 1_048_576, 100.0)],
             arch="x86_64",
         )
         for i in range(3)
@@ -462,8 +447,7 @@ def test_reference_arch_is_the_one_with_more_blocks(tmp_path: Path) -> None:
     blocks.append(
         _write_bench(
             tmp_path / "a1" / "bench.json",
-            [_obs(p, 1_048_576, ns) for p, ns in peers]
-            + [_obs("outlier", 1_048_576, 400.0)],
+            [_obs(p, 1_048_576, ns) for p, ns in peers] + [_obs("outlier", 1_048_576, 400.0)],
             arch="aarch64",
         )
     )

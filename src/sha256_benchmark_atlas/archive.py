@@ -104,9 +104,7 @@ def archive_blocks(block_dirs: list[Path], out_dir: Path) -> dict[str, Any]:
             None,
         )
         if fp_path is not None:
-            total += _write_gz(
-                dest / "fingerprint.json.gz", _trim_fingerprint(_read_json(fp_path))
-            )
+            total += _write_gz(dest / "fingerprint.json.gz", _trim_fingerprint(_read_json(fp_path)))
 
         # The static audit is per-host evidence about which code path shipped, and is
         # only interpretable next to the timings from that same host.
@@ -130,7 +128,5 @@ def archive_blocks(block_dirs: list[Path], out_dir: Path) -> dict[str, Any]:
         "block_count": len(written),
         "total_bytes": total,
     }
-    (out_dir / "manifest.json").write_text(
-        json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
-    )
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest

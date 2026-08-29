@@ -41,9 +41,11 @@ NO_SHA_DISASM = """
 @pytest.fixture
 def fake_objdump(monkeypatch: pytest.MonkeyPatch):
     """Drive the counter from canned disassembly instead of a real toolchain."""
+
     def install(text: str) -> None:
         monkeypatch.setattr(ca, "_disassembler", lambda: ["fake-objdump", "-d"])
         monkeypatch.setattr(ca, "_run", lambda cmd, timeout=120.0: text)
+
     return install
 
 
@@ -144,7 +146,7 @@ def test_probe_does_not_let_the_shell_expand_variables(tmp_path: Path) -> None:
     """Ruby's probe contains `$LOADED_FEATURES`; a shell would eat it."""
     target = _artifact(tmp_path)
     python = shutil.which("python3") or "python3"
-    cmd = f'{python} -c "print(\'$NOT_A_SHELL_VAR\' and {str(target)!r})"'
+    cmd = f"{python} -c \"print('$NOT_A_SHELL_VAR' and {str(target)!r})\""
     assert ca._probe_artifact(cmd) == target
 
 
