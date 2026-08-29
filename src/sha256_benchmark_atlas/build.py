@@ -82,6 +82,9 @@ def build_impl(root: Path, impl: Implementation) -> BuildResult:
     if r.returncode != 0:
         detail = (r.stderr or r.stdout or "build failed").strip()[:800]
         return BuildResult(impl.id, False, detail)
+    path = root / impl.binary
+    if not path.exists():
+        return BuildResult(impl.id, False, f"missing {impl.binary} after build")
     return BuildResult(impl.id, True, "built")
 
 

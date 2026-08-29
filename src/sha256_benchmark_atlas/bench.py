@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import platform
 import random
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .analysis import check_timed_path_digests
+from .fingerprint import collect_fingerprint, normalize_arch
 from .registry import load_registry
 from .runner import bench_once
 
@@ -31,6 +34,21 @@ def choose_iters(size: int, *, slow: bool = False) -> int:
     if size <= 1_048_576:
         return 200
     return 20
+
+
+def _host_facts() -> dict[str, Any]:
+    """Enough host identity for a bench file to be self-describing when detached."""
+    try:
+        fp = collect_fingerprint()
+        return {
+            "arch": fp["cpu"].get("arch"),
+            "cpu_model": fp["cpu"].get("model_name"),
+            "sha256_hw": fp["cpu"].get("sha256_hw"),
+            "openssl": (fp.get("tools") or {}).get("openssl"),
+            "system": fp["platform"].get("system"),
+        }
+    except Exception:  # noqa: BLE001 - a fingerprint failure must not lose the bench
+        return {"arch": normalize_arch(platform.machine())}
 
 
 def run_interleaved_bench(
@@ -97,11 +115,21 @@ def run_interleaved_bench(
                     }
                 )
 
+    digest_agreement = check_timed_path_digests(observations)
+    if not digest_agreement["ok"]:
+        print(
+            f"WARNING: timed-path digest disagreement in "
+            f"{digest_agreement['disagreement_count']} cell(s); "
+            "these measurements are not comparable."
+        )
+
     result: dict[str, Any] = {
         "collected_at": datetime.now(UTC).isoformat(),
         "seed": seed,
         "reps": reps,
         "sizes": sizes_f,
+        "host": _host_facts(),
+        "digest_agreement": digest_agreement,
         "implementations": [i.as_dict() for i in impls],
         "observations": observations,
     }

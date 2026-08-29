@@ -48,10 +48,21 @@ function cmdVerify() {
   }
 }
 
+// Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+// tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+// same time far too many iterations for a multi-second software hash of a large
+// buffer. Every runner in this atlas uses the same two numbers.
+const WARMUP_BUDGET_NS = 200_000_000n; // 200 ms
+const WARMUP_MAX_ITERS = 100_000;
+
 function cmdBench(size, iters, seed) {
   const buf = fillBuf(size, seed);
   let last = digestHex(buf);
-  for (let i = 0; i < 3; i++) last = digestHex(buf);
+  const w0 = process.hrtime.bigint();
+  for (let w = 0; w < WARMUP_MAX_ITERS; w++) {
+    last = digestHex(buf);
+    if (process.hrtime.bigint() - w0 >= WARMUP_BUDGET_NS) break;
+  }
   const t0 = process.hrtime.bigint();
   for (let i = 0; i < iters; i++) last = digestHex(buf);
   const ns = Number(process.hrtime.bigint() - t0);

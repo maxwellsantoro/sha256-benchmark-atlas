@@ -1,6 +1,13 @@
 use ring::digest::{digest, SHA256};
 use std::io::{self, Read, Write};
-use std::time::Instant;
+use std::time::{Duration, Instant};
+
+// Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+// tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+// same time far too many iterations for a multi-second software hash of a large
+// buffer. Every runner in this atlas uses the same two numbers.
+const WARMUP_BUDGET: Duration = Duration::from_millis(200);
+const WARMUP_MAX_ITERS: u64 = 100_000;
 
 fn fill_buf(size: usize, seed: u64) -> Vec<u8> {
     let mut s = if seed == 0 { 0xC0FFEE } else { seed };
@@ -50,8 +57,12 @@ fn cmd_verify() -> io::Result<()> {
 fn cmd_bench(size: usize, iters: u64, seed: u64) {
     let buf = fill_buf(size, seed);
     let mut last = digest(&SHA256, &buf);
-    for _ in 0..3 {
+    let w0 = Instant::now();
+    for _ in 0..WARMUP_MAX_ITERS {
         last = digest(&SHA256, &buf);
+        if w0.elapsed() >= WARMUP_BUDGET {
+            break;
+        }
     }
     let t0 = Instant::now();
     for _ in 0..iters {

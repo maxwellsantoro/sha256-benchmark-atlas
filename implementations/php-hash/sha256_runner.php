@@ -61,11 +61,20 @@ function cmd_verify(): void {
     }
 }
 
+// Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+// tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+// same time far too many iterations for a multi-second software hash of a large
+// buffer. Every runner in this atlas uses the same two numbers.
+const WARMUP_BUDGET_NS = 200000000; // 200 ms
+const WARMUP_MAX_ITERS = 100000;
+
 function cmd_bench(int $size, int $iters, int $seed): void {
     $buf = fill_buf($size, $seed);
     $last = digest_hex($buf);
-    for ($i = 0; $i < 3; $i++) {
+    $w0 = hrtime(true);
+    for ($w = 0; $w < WARMUP_MAX_ITERS; $w++) {
         $last = digest_hex($buf);
+        if (hrtime(true) - $w0 >= WARMUP_BUDGET_NS) { break; }
     }
     $t0 = hrtime(true);
     for ($i = 0; $i < $iters; $i++) {

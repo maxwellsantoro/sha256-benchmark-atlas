@@ -18,12 +18,14 @@ results/**
 
 # Native / language build artifacts
 implementations/**/sha256_runner
+implementations/**/sha256_runner.wasm
 implementations/**/target/
 implementations/**/zig-out/
 implementations/**/.zig-cache/
 implementations/java-jdk/out/
 implementations/java-bouncycastle/out/
 implementations/java-bouncycastle/bcprov.jar
+implementations/csharp-dotnet/out/
 implementations/**/*.class
 
 # Editor / OS

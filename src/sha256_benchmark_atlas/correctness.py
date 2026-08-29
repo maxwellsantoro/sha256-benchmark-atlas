@@ -8,6 +8,8 @@ from typing import Any
 from .registry import Implementation, load_registry
 from .runner import verify_batch
 
+MAX_FAILURE_SAMPLES = 5
+
 
 def _oracle(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -84,28 +86,34 @@ def check_impl(
         return {
             "id": impl.id,
             "checked": 0,
-            "failed": 1,
-            "failures": [{"case": "<batch>", "error": str(e)}],
+            "failed": len(cases),
+            "failure_samples": [{"case": "<batch>", "error": str(e)}],
+            "failures_truncated": False,
             "ok": False,
         }
+    # Count every failure but keep only a sample. Stopping the scan at the sample
+    # limit would report `failed: 5` for an implementation that got all 10,021
+    # cases wrong, which understates the damage in the archived report.
+    failed = 0
     for (cid, msg, exp), got in zip(cases, got_list, strict=True):
         if got != exp:
-            failures.append(
-                {
-                    "case": cid,
-                    "expected": exp,
-                    "got": got,
-                    "len": str(len(msg)),
-                }
-            )
-            if len(failures) >= 5:
-                break
+            failed += 1
+            if len(failures) < MAX_FAILURE_SAMPLES:
+                failures.append(
+                    {
+                        "case": cid,
+                        "expected": exp,
+                        "got": got,
+                        "len": str(len(msg)),
+                    }
+                )
     return {
         "id": impl.id,
         "checked": len(cases),
-        "failed": len(failures),
-        "failures": failures,
-        "ok": len(failures) == 0,
+        "failed": failed,
+        "failure_samples": failures,
+        "failures_truncated": failed > len(failures),
+        "ok": failed == 0,
     }
 
 
@@ -117,16 +125,36 @@ def run_correctness(
 ) -> dict[str, Any]:
     reg = load_registry(root)
     impls = reg.by_id(ids)
-    cases = (
-        load_nist_vectors(root, skip_million=skip_million)
-        + boundary_vectors()
-        + streamish_cases()
-        + make_prng_cases(prng_cases)
-    )
+    nist = load_nist_vectors(root, skip_million=skip_million)
+    cases = nist + boundary_vectors() + streamish_cases() + make_prng_cases(prng_cases)
     results = [check_impl(root, impl, cases) for impl in impls]
     passed = all(r["ok"] for r in results) and len(results) > 0
+    agreeing = [r["id"] for r in results if r["ok"]]
+
     return {
         "passed": passed,
         "case_count": len(cases),
+        # Oracle provenance, stated rather than implied. Only the NIST/FIPS vectors
+        # are externally published ground truth; every other expected digest comes
+        # from hashlib, which is itself usually OpenSSL. The independent evidence is
+        # therefore not the oracle but the unanimity below: N implementations across
+        # N backends, agreeing digest-for-digest on every case.
+        "oracle": {
+            "external_ground_truth_cases": len(nist),
+            "oracle_derived_cases": len(cases) - len(nist),
+            "oracle": "hashlib.sha256 (typically OpenSSL-backed)",
+            "note": (
+                "Oracle-derived cases cannot detect an error shared with the oracle; "
+                "cross-implementation unanimity is the independent check."
+            ),
+        },
+        "differential": {
+            "implementations_checked": len(results),
+            "implementations_agreeing": len(agreeing),
+            "unanimous": len(agreeing) == len(results) and len(results) > 1,
+            "distinct_backends_agreeing": sorted(
+                {str(i.backend) for i in impls if i.id in set(agreeing) and i.backend}
+            ),
+        },
         "implementations": results,
     }

@@ -1,0 +1,66 @@
+{
+  "blocks": [
+    {
+      "block_id": "results-shard-0-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49176
+    },
+    {
+      "block_id": "results-shard-1-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49020
+    },
+    {
+      "block_id": "results-shard-10-ubuntu-24.04-arm",
+      "observations": 1615,
+      "bytes": 48685
+    },
+    {
+      "block_id": "results-shard-11-ubuntu-24.04-arm",
+      "observations": 1615,
+      "bytes": 48649
+    },
+    {
+      "block_id": "results-shard-2-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49203
+    },
+    {
+      "block_id": "results-shard-3-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49102
+    },
+    {
+      "block_id": "results-shard-4-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49275
+    },
+    {
+      "block_id": "results-shard-5-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49215
+    },
+    {
+      "block_id": "results-shard-6-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49792
+    },
+    {
+      "block_id": "results-shard-7-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49244
+    },
+    {
+      "block_id": "results-shard-8-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49154
+    },
+    {
+      "block_id": "results-shard-9-ubuntu-24.04",
+      "observations": 1615,
+      "bytes": 49230
+    }
+  ],
+  "block_count": 12,
+  "total_bytes": 617408
+}

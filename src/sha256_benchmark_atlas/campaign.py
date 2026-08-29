@@ -6,8 +6,10 @@ from pathlib import Path
 
 from .bench import run_interleaved_bench
 from .build import build_all
+from .capability_audit import audit_all
 from .correctness import run_correctness
 from .fingerprint import write_fingerprint
+from .registry import load_registry
 
 
 def run_campaign(
@@ -47,6 +49,14 @@ def run_campaign(
     if ids:
         built_ids = [i for i in built_ids if i in ids]
 
+    print("== static capability audit")
+    audit = audit_all(root, load_registry(root).by_id(built_ids))
+    (out / "audit.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
+    print(
+        f"  {audit['with_hardware_path']}/{audit['audited']} audited implementations ship a "
+        f"hardware SHA-256 path on {audit['arch']} ({audit['skipped']} not auditable)"
+    )
+
     print("== correctness")
     correctness = run_correctness(
         root,
@@ -54,9 +64,13 @@ def run_campaign(
         prng_cases=cases,
         skip_million=skip_million,
     )
-    (out / "correctness.json").write_text(json.dumps(correctness, indent=2) + "\n", encoding="utf-8")
+    (out / "correctness.json").write_text(
+        json.dumps(correctness, indent=2) + "\n", encoding="utf-8"
+    )
     for r in correctness["implementations"]:
-        print(f"  [{'ok' if r['ok'] else 'FAIL'}] {r['id']}: checked={r['checked']} failed={r['failed']}")
+        print(
+            f"  [{'ok' if r['ok'] else 'FAIL'}] {r['id']}: checked={r['checked']} failed={r['failed']}"
+        )
     admitted = [r["id"] for r in correctness["implementations"] if r["ok"]]
     if not admitted:
         print("Correctness gate admitted nobody; skipping bench.")

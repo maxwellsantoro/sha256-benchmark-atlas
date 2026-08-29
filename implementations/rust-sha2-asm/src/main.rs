@@ -1,0 +1,106 @@
+// Same RustCrypto sha2 crate as rust-sha2, but with the `asm` feature so ARMv8
+// crypto extensions are compiled in (the default build falls back to portable).
+use sha2::{Digest, Sha256};
+use std::io::{self, Read, Write};
+use std::time::{Duration, Instant};
+
+// Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+// tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+// same time far too many iterations for a multi-second software hash of a large
+// buffer. Every runner in this atlas uses the same two numbers.
+const WARMUP_BUDGET: Duration = Duration::from_millis(200);
+const WARMUP_MAX_ITERS: u64 = 100_000;
+
+fn fill_buf(size: usize, seed: u64) -> Vec<u8> {
+    let mut s = if seed == 0 { 0xC0FFEE } else { seed };
+    let mut buf = vec![0u8; size];
+    for b in &mut buf {
+        s = s.wrapping_mul(6364136223846793005).wrapping_add(1);
+        *b = (s >> 56) as u8;
+    }
+    buf
+}
+
+fn digest_hex(data: &[u8]) -> String {
+    hex_encode(&Sha256::digest(data))
+}
+
+fn hex_encode(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+fn cmd_hash() -> io::Result<()> {
+    let mut buf = Vec::new();
+    io::stdin().read_to_end(&mut buf)?;
+    println!("{}", digest_hex(&buf));
+    Ok(())
+}
+
+fn cmd_verify() -> io::Result<()> {
+    let mut stdin = io::stdin().lock();
+    let mut stdout = io::stdout().lock();
+    loop {
+        let mut lenbuf = [0u8; 4];
+        match stdin.read_exact(&mut lenbuf) {
+            Ok(()) => {}
+            Err(e) if e.kind() == io::ErrorKind::UnexpectedEof => break,
+            Err(e) => return Err(e),
+        }
+        let len = u32::from_be_bytes(lenbuf) as usize;
+        let mut buf = vec![0u8; len];
+        if len > 0 {
+            stdin.read_exact(&mut buf)?;
+        }
+        writeln!(stdout, "{}", digest_hex(&buf))?;
+    }
+    Ok(())
+}
+
+fn cmd_bench(size: usize, iters: u64, seed: u64) {
+    let buf = fill_buf(size, seed);
+    let mut last = Sha256::digest(&buf);
+    let w0 = Instant::now();
+    for _ in 0..WARMUP_MAX_ITERS {
+        last = Sha256::digest(&buf);
+        if w0.elapsed() >= WARMUP_BUDGET {
+            break;
+        }
+    }
+    let t0 = Instant::now();
+    for _ in 0..iters {
+        last = Sha256::digest(&buf);
+    }
+    let ns = t0.elapsed().as_nanos();
+    println!(
+        "{{\"ns_total\":{ns},\"hashes\":{iters},\"size\":{size},\"digest\":\"{}\"}}",
+        hex_encode(&last)
+    );
+}
+
+fn main() {
+    let mut args = std::env::args().skip(1);
+    match args.next().as_deref() {
+        Some("hash") => {
+            if let Err(e) = cmd_hash() {
+                eprintln!("{e}");
+                std::process::exit(1);
+            }
+        }
+        Some("verify") => {
+            if let Err(e) = cmd_verify() {
+                eprintln!("{e}");
+                std::process::exit(1);
+            }
+        }
+        Some("bench") => {
+            let size: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(0);
+            let iters: u64 = args.next().and_then(|s| s.parse().ok()).unwrap_or(1);
+            let seed: u64 = args.next().and_then(|s| s.parse().ok()).unwrap_or(1);
+            cmd_bench(size, iters, seed);
+        }
+        _ => {
+            eprintln!("usage: sha256_runner hash | verify | bench SIZE ITERS [SEED]");
+            std::process::exit(2);
+        }
+    }
+}

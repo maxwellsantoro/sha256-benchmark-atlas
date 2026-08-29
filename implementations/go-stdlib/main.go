@@ -57,11 +57,24 @@ func cmdVerify() error {
 	}
 }
 
+// Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+// tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+// same time far too many iterations for a multi-second software hash of a large
+// buffer. Every runner in this atlas uses the same two numbers.
+const (
+	warmupBudget    = 200 * time.Millisecond
+	warmupMaxIters  = 100_000
+)
+
 func cmdBench(size int, iters uint64, seed uint64) {
 	buf := fillBuf(size, seed)
 	var last [32]byte
-	for i := 0; i < 3; i++ {
+	w0 := time.Now()
+	for w := uint64(0); w < warmupMaxIters; w++ {
 		last = sha256.Sum256(buf)
+		if time.Since(w0) >= warmupBudget {
+			break
+		}
 	}
 	t0 := time.Now()
 	for i := uint64(0); i < iters; i++ {

@@ -25,7 +25,9 @@ def runner_argv(root: Path, impl: Implementation) -> list[str]:
         return ["bun", str(binary)]
     if interpreter == "java":
         main = impl.java_main or "Sha256Runner"
-        cp = os.pathsep.join([str(binary), str(root / impl.java_cp)] if impl.java_cp else [str(binary)])
+        cp = os.pathsep.join(
+            [str(binary), str(root / impl.java_cp)] if impl.java_cp else [str(binary)]
+        )
         return ["java", "-cp", cp, main]
     return [str(binary)]
 

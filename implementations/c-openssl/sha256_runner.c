@@ -11,6 +11,13 @@
 #include <string.h>
 #include <time.h>
 
+/* Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+ * tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+ * same time far too many iterations for a multi-second software hash of a large
+ * buffer. Every runner in this atlas uses the same two numbers. */
+#define WARMUP_BUDGET_NS 200000000ULL /* 200 ms */
+#define WARMUP_MAX_ITERS 100000ULL
+
 static int hex_digest(const unsigned char *d, unsigned int n) {
     for (unsigned int i = 0; i < n; i++)
         printf("%02x", d[i]);
@@ -101,9 +108,11 @@ static int cmd_bench(size_t size, uint64_t iters, uint64_t seed) {
     unsigned char digest[32];
     if (!buf && size) return 1;
     fill_buf(buf, size, seed);
-    /* warmup */
-    for (int i = 0; i < 3; i++)
+    uint64_t w0 = now_ns();
+    for (uint64_t w = 0; w < WARMUP_MAX_ITERS; w++) {
         if (do_hash(buf, size, digest)) { free(buf); return 1; }
+        if (now_ns() - w0 >= WARMUP_BUDGET_NS) break;
+    }
     uint64_t t0 = now_ns();
     for (uint64_t i = 0; i < iters; i++)
         if (do_hash(buf, size, digest)) { free(buf); return 1; }

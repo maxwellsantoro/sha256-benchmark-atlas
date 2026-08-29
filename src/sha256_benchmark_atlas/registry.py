@@ -65,7 +65,9 @@ class Registry:
             out.append(impl)
         return out
 
-    def by_id(self, ids: list[str] | None = None, *, admitted_only: bool = True) -> list[Implementation]:
+    def by_id(
+        self, ids: list[str] | None = None, *, admitted_only: bool = True
+    ) -> list[Implementation]:
         impls = self.implementations(admitted_only=admitted_only)
         if ids is None:
             return impls

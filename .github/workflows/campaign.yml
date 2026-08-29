@@ -76,8 +76,28 @@ jobs:
         with:
           version: 0.14.0
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install Odin
+        uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: latest
+
+      - name: Install Wasmtime
+        uses: bytecodealliance/actions/wasmtime/setup@v1
+        with:
+          version: "25.0.0"
+
       - name: Install native crypto libraries
-        run: sudo apt-get update && sudo apt-get install -y libssl-dev libsodium-dev libmbedtls-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libssl-dev libsodium-dev libmbedtls-dev \
+            libbotan-2-dev libcrypto++-dev nettle-dev \
+            libgcrypt20-dev libwolfssl-dev libnss3-dev
 
       - name: Environment fingerprint (raw)
         run: |
@@ -98,6 +118,11 @@ jobs:
           echo "== php"; php --version
           echo "== bun"; bun --version
           echo "== zig"; zig version
+          echo "== odin"; odin version || true
+          echo "== dotnet"; dotnet --version || true
+          echo "== wasmtime"; wasmtime --version || true
+          echo "== botan"; pkg-config --modversion botan-3 2>/dev/null || pkg-config --modversion botan-2 || true
+          echo "== nettle"; pkg-config --modversion nettle || true
           true
 
       - name: Sync harness
@@ -147,36 +172,64 @@ jobs:
           pattern: results-shard-*
           merge-multiple: false
 
-      - name: Sync + summarize
+      - name: Sync + archive + summarize
         env:
           REPS: ${{ github.event.inputs.reps || '5' }}
           CASES: ${{ github.event.inputs.cases || '10000' }}
           MAX_SIZE: ${{ github.event.inputs.max_size || '1048576' }}
         run: |
+          set -euo pipefail
           uv sync
           mkdir -p results/aggregate results/latest
-          find artifacts -name bench.json > /tmp/bench_list.txt || true
-          if [ -s /tmp/bench_list.txt ]; then
-            mapfile -t FILES < /tmp/bench_list.txt
-            BLOCKS=$(wc -l < /tmp/bench_list.txt | tr -d ' ')
-            uv run sha256-atlas summarize "${FILES[@]}" -o results/aggregate/summary.json
-            cp results/aggregate/summary.json results/latest/summary.json
-            printf '{"run_id":%s,"run_url":"%s","completed_at":"%s","blocks":%s,"shards":"0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)","reps":%s,"cases":%s,"max_size_bytes":%s}\n' \
-              "${{ github.run_id }}" \
-              "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-              "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-              "$BLOCKS" \
-              "$REPS" "$CASES" "$MAX_SIZE" \
-              > results/latest/meta.json
-            {
-              echo "## Campaign aggregate"
-              echo "Blocks: $BLOCKS"
-              echo ""
-              uv run sha256-atlas summarize "${FILES[@]}" | head -c 60000
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
+
+          # One directory per experimental block, each holding bench.json.
+          mapfile -t BLOCK_DIRS < <(find artifacts -name bench.json -exec dirname {} \; | sort)
+          if [ "${#BLOCK_DIRS[@]}" -eq 0 ]; then
             echo "No bench.json artifacts found" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi
+          BLOCKS="${#BLOCK_DIRS[@]}"
+
+          # Commit the raw observations, not just the derived medians. Gzipped this
+          # is well under a megabyte, and it is what lets a published claim be
+          # re-derived or challenged after CI artifact retention expires.
+          rm -rf results/latest/blocks
+          uv run sha256-atlas archive "${BLOCK_DIRS[@]}" -o results/latest/blocks
+
+          # Summarize from the archive so the committed evidence and the committed
+          # summary cannot drift apart.
+          uv run sha256-atlas summarize results/latest/blocks/*/bench.json.gz \
+            -o results/aggregate/summary.json \
+            --fail-on-digest-disagreement > /dev/null
+          cp results/aggregate/summary.json results/latest/summary.json
+
+          uv run python - "$BLOCKS" "$REPS" "$CASES" "$MAX_SIZE" <<'PY' > results/latest/meta.json
+          import json, os, sys, datetime
+          blocks, reps, cases, max_size = (int(a) for a in sys.argv[1:5])
+          summary = json.load(open("results/latest/summary.json"))
+          print(json.dumps({
+              "run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "run_url": f'{os.environ["GITHUB_SERVER_URL"]}/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}',
+              "completed_at": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "blocks": blocks,
+              "shards": "0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)",
+              "reps": reps,
+              "cases": cases,
+              "max_size_bytes": max_size,
+              "summary_schema_version": summary["schema_version"],
+              "arch_block_counts": summary["arch_block_counts"],
+              "host_population": {
+                  arch: {"blocks": s["block_count"], "cpu_models": s["cpu_models"]}
+                  for arch, s in summary["strata"].items()
+              },
+          }, indent=2))
+          PY
+
+          {
+            echo "## Campaign aggregate"
+            echo ""
+            uv run sha256-atlas summarize results/latest/blocks/*/bench.json.gz --markdown | head -c 60000
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload aggregate
         uses: actions/upload-artifact@v4
@@ -187,9 +240,11 @@ jobs:
             results/latest
           retention-days: 30
 
-      # Keep the checked-in results/latest/ in sync with reality. Without this,
-      # the README table and results/latest/*.json only reflect whichever run
-      # someone happened to download and commit by hand (see PAIN.md).
+      # Keep the checked-in results/latest/ in sync with reality — the raw block
+      # archive as well as the summary, so the published claim always ships with
+      # the observations it was derived from. Without this, the README table and
+      # results/latest/ only reflect whichever run someone happened to download and
+      # commit by hand (see PAIN.md).
       # Skipped on PRs (forked PRs don't have write access to GITHUB_TOKEN,
       # and PR branches shouldn't push to main anyway).
       - name: Commit results/latest
