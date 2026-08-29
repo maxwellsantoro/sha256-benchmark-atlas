@@ -72,17 +72,17 @@ Each workflow job is one **experimental block**:
 
 Host-to-host speed variation is a nuisance factor. On-machine ratios \(T_A / T_B\) cancel much of it.
 
-## Latest campaign ([run #33040294314](https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/33040294314))
+## Latest campaign ([run #33234020231](https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/33234020231))
 
-12 independent GitHub-hosted blocks (10× `ubuntu-24.04`, 2× `ubuntu-24.04-arm`), 5 interleaved reps, 10k correctness cases, sizes 0–1 MiB. Aggregate: [`results/latest/summary.json`](results/latest/summary.json).
+12 independent GitHub-hosted blocks (10× `ubuntu-24.04`, 2× `ubuntu-24.04-arm`), 5 interleaved reps, 10k correctness cases, sizes 0–1 MiB, all 19 admitted implementations passing correctness and benched. Aggregate: [`results/latest/summary.json`](results/latest/summary.json).
 
 | Message size | Fastest (median ns/hash) | Bulk throughput @ 1 MiB |
 |---|---|---|
-| 0 B | go-stdlib (79 ns) | — |
-| 64 B | rust-sha2 (97 ns) | — |
-| 1 MiB | go-stdlib ≈ python-hashlib ≈ c-openssl (~1.58 GB/s) | same OpenSSL backend cluster |
+| 0 B | rust-sha2 (75 ns) | — |
+| 64 B | rust-sha2 (95 ns) | — |
+| 1 MiB | rust-ring ≈ rust-sha2 ≈ go-stdlib ≈ python-hashlib (~1.59 GB/s) | same OpenSSL backend cluster |
 
-At 1 MiB, **go-stdlib**, **python-hashlib**, **c-openssl**, and **node-crypto** converge within ~1% — consistent with measuring the same underlying native primitive through different front ends. **java-jdk** ~1.4× slower; **c-ref** ~8×; **python-pure** orders of magnitude slower (expected).
+At 1 MiB, six independent OpenSSL front-ends — **python-hashlib**, **c-openssl**, **rust-openssl**, **python-cryptography**, **ruby-openssl**, **node-crypto** — converge within ~1% (spread ratio 1.008×): consistent with measuring the same underlying native primitive through different front ends. **zig-std** and **java-jdk** are ~1.1–1.2× slower; **php-hash** ~6×; **c-ref** ~7.5×; **java-bouncycastle** (pure-Java, no hardware SHA intrinsics) ~10×; **python-pure** orders of magnitude slower (expected).
 
 ## Leaderboards (conceptual)
 
