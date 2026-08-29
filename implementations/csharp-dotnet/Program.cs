@@ -21,7 +21,13 @@ static string DigestHex(ReadOnlySpan<byte> data)
 {
     Span<byte> hash = stackalloc byte[32];
     SHA256.HashData(data, hash);
-    return Convert.ToHexStringLower(hash);
+    return ToHexLower(hash);
+}
+
+static string ToHexLower(ReadOnlySpan<byte> bytes)
+{
+    // Convert.ToHexStringLower is .NET 9+; atlas CI targets .NET 8.
+    return Convert.ToHexString(bytes).ToLowerInvariant();
 }
 
 static int CmdHash()
@@ -74,7 +80,7 @@ static int CmdBench(int size, ulong iters, ulong seed)
         SHA256.HashData(buf, last);
     sw.Stop();
     var ns = (long)(sw.Elapsed.TotalNanoseconds);
-    var digest = Convert.ToHexStringLower(last);
+    var digest = ToHexLower(last);
     Console.WriteLine(
         JsonSerializer.Serialize(new Dictionary<string, object>
         {
