@@ -151,3 +151,15 @@ should cite entries from this list.
 27. **A registry field can be wrong for years without anyone noticing** — `php-hash` was
     marked `hardware_acceleration: auto`; it ships no SHA-256 instructions and its
     per-block cost matches the portable cohort on both architectures.
+
+28. **Aggregate the median across blocks, not the worst block** — with ten blocks spread
+    over four CPU models there is nearly always one noisy host, and flagging on the
+    worst block reported healthy ahead-of-time implementations as never reaching steady
+    state. Take the per-size median across blocks first, then the worst size.
+29. **A 200 ms warmup budget is not enough for the JVM at mid sizes** — measured against
+    the residual diagnostic, the budget took java-jdk from 69% to 12.5% off its own model
+    at 4 KiB, java-bouncycastle from 22% to 3%, node-crypto from 24% to 7% and bun-crypto
+    from 11% to 1%. java-jdk alone is still short: 4 KiB runs 2000 timed iterations and
+    C2 wants ~10k invocations. Raising the shared budget is the obvious fix and an
+    expensive one — warmup already costs ~5 minutes per block — so it is recorded rather
+    than silently absorbed.

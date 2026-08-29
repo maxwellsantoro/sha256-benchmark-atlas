@@ -183,8 +183,23 @@ def aggregate_models(models: list[CostModel]) -> dict[str, Any] | None:
         }
 
     worst = max(models, key=lambda m: m.max_abs_residual)
-    worst_ss = max(models, key=lambda m: m.steady_state_residual)
     b_median = statistics.median(b)
+
+    # Residuals are aggregated by taking the median across blocks *first*, then the
+    # worst size. Taking the worst block instead lets a single noisy host — and with
+    # ten blocks spread over four CPU models there is usually one — flag an
+    # implementation whose typical behaviour is fine.
+    median_residuals = {
+        size: statistics.median(
+            [m.residuals_by_size[size] for m in models if size in m.residuals_by_size]
+        )
+        for size in sorted({s for m in models for s in m.residuals_by_size})
+    }
+    ss_size, ss = None, 0.0
+    for size, r in median_residuals.items():
+        if size >= STEADY_STATE_MIN_SIZE and abs(r) > abs(ss):
+            ss_size, ss = size, r
+
     return {
         "blocks_fitted": len(models),
         "a_ns_fixed": spread(a),
@@ -194,15 +209,13 @@ def aggregate_models(models: list[CostModel]) -> dict[str, Any] | None:
         "worst_residual_size": worst.worst_residual_size,
         # The diagnostic that matters: a departure at a size where the model is
         # otherwise exact. Large values here are a not-at-steady-state signal.
-        "steady_state_residual": worst_ss.steady_state_residual,
-        "steady_state_residual_size": worst_ss.steady_state_residual_size,
-        "reached_steady_state": worst_ss.steady_state_residual <= RESIDUAL_FLAG,
-        "residuals_by_size": {
-            str(size): statistics.median(
-                [m.residuals_by_size[size] for m in models if size in m.residuals_by_size]
-            )
-            for size in sorted({s for m in models for s in m.residuals_by_size})
-        },
+        "steady_state_residual": abs(ss),
+        "steady_state_residual_size": ss_size,
+        "steady_state_residual_worst_block": max(
+            m.steady_state_residual for m in models
+        ),
+        "reached_steady_state": abs(ss) <= RESIDUAL_FLAG,
+        "residuals_by_size": {str(k): v for k, v in median_residuals.items()},
         "slope_fit_sizes": models[0].slope_fit_sizes,
         "intercept_fit_sizes": models[0].intercept_fit_sizes,
     }

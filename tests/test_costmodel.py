@@ -110,6 +110,41 @@ def test_aggregate_of_nothing_is_none() -> None:
     assert aggregate_models([]) is None
 
 
+def test_one_noisy_block_does_not_flag_a_healthy_implementation() -> None:
+    """Ten blocks over four CPU models nearly always include one outlier.
+
+    Aggregating the worst block instead of the median across blocks made an
+    ahead-of-time implementation look like it never reached steady state.
+    """
+    clean = [fit_cost_model(synthetic(30.0, 40.0)) for _ in range(9)]
+    noisy_data = synthetic(30.0, 40.0)
+    noisy_data[4096] *= 1.9
+    models = [m for m in [*clean, fit_cost_model(noisy_data)] if m]
+
+    agg = aggregate_models(models)
+
+    assert agg is not None
+    assert agg["reached_steady_state"] is True
+    assert agg["steady_state_residual"] < RESIDUAL_FLAG
+    # The outlier is still reported, just not used to judge the implementation.
+    assert agg["steady_state_residual_worst_block"] > RESIDUAL_FLAG
+
+
+def test_a_consistently_slow_size_is_still_flagged() -> None:
+    """The majority behaviour is what counts, and here the majority is bad."""
+    models = []
+    for _ in range(10):
+        data = synthetic(1200.0, 45.0)
+        data[4096] *= 1.5
+        models.append(fit_cost_model(data))
+
+    agg = aggregate_models([m for m in models if m])
+
+    assert agg is not None
+    assert agg["reached_steady_state"] is False
+    assert agg["steady_state_residual_size"] == 4096
+
+
 # --- degenerate input -----------------------------------------------------
 
 
