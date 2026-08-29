@@ -15,16 +15,16 @@ fn digestHex(data: []const u8, hexbuf: *[64]u8) []const u8 {
 }
 
 fn readAllStdin(allocator: std.mem.Allocator) ![]u8 {
-    var stdin = std.io.getStdIn().reader();
-    var list: std.ArrayList(u8) = .empty;
-    errdefer list.deinit(allocator);
+    const stdin = std.io.getStdIn().reader();
+    var list = std.ArrayList(u8).init(allocator);
+    errdefer list.deinit();
     var buf: [65536]u8 = undefined;
     while (true) {
         const n = try stdin.read(&buf);
         if (n == 0) break;
-        try list.appendSlice(allocator, buf[0..n]);
+        try list.appendSlice(buf[0..n]);
     }
-    return try list.toOwnedSlice(allocator);
+    return try list.toOwnedSlice();
 }
 
 fn cmdHash(allocator: std.mem.Allocator) !void {
@@ -45,7 +45,7 @@ fn readExact(reader: anytype, buf: []u8) !void {
 }
 
 fn cmdVerify(allocator: std.mem.Allocator) !void {
-    var stdin = std.io.getStdIn().reader();
+    const stdin = std.io.getStdIn().reader();
     var stdout = std.io.getStdOut().writer();
     var lenbuf: [4]u8 = undefined;
     var hexbuf: [64]u8 = undefined;

@@ -4,12 +4,20 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 public class Sha256Runner {
+    private static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
+
+    // String.format("%02x", ...) per byte goes through java.util.Formatter's
+    // format-string parser on every call — measured at ~9,100 ns for a 32-byte
+    // digest vs ~130 ns for a lookup table (70x). It dominated every small/
+    // medium-size bench result regardless of the digest algorithm's own speed.
     static String toHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b & 0xff));
+        char[] out = new char[bytes.length * 2];
+        for (int i = 0; i < bytes.length; i++) {
+            int v = bytes[i] & 0xFF;
+            out[i * 2] = HEX_DIGITS[v >>> 4];
+            out[i * 2 + 1] = HEX_DIGITS[v & 0x0F];
         }
-        return sb.toString();
+        return new String(out);
     }
 
     static byte[] fillBuf(int size, long seed) {

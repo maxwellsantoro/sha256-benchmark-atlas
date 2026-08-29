@@ -8,7 +8,7 @@ function fill_buf(int $size, int $seed): string {
     $mul = gmp_init('6364136223846793005');
     $buf = '';
     for ($i = 0; $i < $size; $i++) {
-        $s = gmp_and(gmp_add(gmp_mul($s, $mul, 1), 1), $mask);
+        $s = gmp_and(gmp_add(gmp_mul($s, $mul), 1), $mask);
         $byte = gmp_intval(gmp_div_q($s, gmp_pow(2, 56))) & 0xFF;
         $buf .= chr($byte);
     }
@@ -28,16 +28,31 @@ function cmd_hash(): void {
     echo digest_hex($data), "\n";
 }
 
+// fread() on a pipe is not guaranteed to return the full requested length in
+// one call (short reads are normal, not an error) — loop until $n bytes are
+// read or the stream hits EOF, like every other runner's read_exact/readFully.
+function read_exact(int $n): string|false {
+    $out = '';
+    while (strlen($out) < $n) {
+        $chunk = fread(STDIN, $n - strlen($out));
+        if ($chunk === false || $chunk === '') {
+            return false; // EOF before $n bytes were read
+        }
+        $out .= $chunk;
+    }
+    return $out;
+}
+
 function cmd_verify(): void {
     while (true) {
-        $hdr = fread(STDIN, 4);
-        if ($hdr === false || strlen($hdr) < 4) {
+        $hdr = read_exact(4);
+        if ($hdr === false) {
             break;
         }
         $arr = unpack('N', $hdr);
         $n = $arr[1];
-        $data = $n > 0 ? fread(STDIN, $n) : '';
-        if ($data === false || strlen($data) !== $n) {
+        $data = $n > 0 ? read_exact($n) : '';
+        if ($data === false) {
             fwrite(STDERR, "truncated verify message\n");
             exit(1);
         }
