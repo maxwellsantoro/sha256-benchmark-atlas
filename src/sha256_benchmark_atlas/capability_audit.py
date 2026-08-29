@@ -42,6 +42,13 @@ BACKEND_LIBRARY_HINTS: dict[str, tuple[str, ...]] = {
     "boringssl": ("libcrypto", "boringssl"),
     "libsodium": ("libsodium",),
     "mbedtls": ("libmbedcrypto", "mbedcrypto"),
+    "botan": ("libbotan", "botan"),
+    "cryptopp": ("libcryptopp", "cryptopp", "libcrypto++"),
+    "nettle": ("libnettle", "nettle"),
+    "libgcrypt": ("libgcrypt",),
+    "wolfssl": ("libwolfssl", "wolfssl"),
+    "nss": ("libnss", "nss3", "nssutil"),
+    "libressl": ("libcrypto", "libressl"),
 }
 
 # Interpreters are frequently a small launcher stub in front of a runtime library

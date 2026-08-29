@@ -8,8 +8,8 @@
   "cases": 10000,
   "max_size_bytes": 1048576,
   "summary_schema_version": 3,
-  "aggregated_at": "2026-08-29T00:00:00Z",
-  "aggregation_note": "Re-aggregated from the archived raw blocks in results/latest/blocks/ under summary schema 3 (architecture strata, within-block ratios, cost model a/b, capability audit cross-checks). Schema 1 pooled 10 x86_64 and 2 aarch64 blocks into single medians; schema 2 stratified without the cost/audit surfaces. Those earlier summaries are superseded.",
+  "aggregated_at": "2026-08-29T19:40:00Z",
+  "aggregation_note": "Re-aggregated from the archived raw blocks in results/latest/blocks/ under summary schema 3 (architecture strata, within-block ratios, cost model a/b, capability audit cross-checks). Cost-model steady_state_residual is the worst size after taking the per-size median residual across blocks (not the worst block); steady_state_residual_worst_block keeps the old max. Schema 1 pooled 10 x86_64 and 2 aarch64 blocks into single medians; schema 2 stratified without the cost/audit surfaces. Those earlier summaries are superseded.",
   "host_population": {
     "x86_64": {
       "blocks": 10,

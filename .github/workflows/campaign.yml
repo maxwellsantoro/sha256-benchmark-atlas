@@ -76,8 +76,28 @@ jobs:
         with:
           version: 0.14.0
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install Odin
+        uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: latest
+
+      - name: Install Wasmtime
+        uses: bytecodealliance/actions/wasmtime/setup@v1
+        with:
+          version: "25.0.0"
+
       - name: Install native crypto libraries
-        run: sudo apt-get update && sudo apt-get install -y libssl-dev libsodium-dev libmbedtls-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libssl-dev libsodium-dev libmbedtls-dev \
+            libbotan-2-dev libcrypto++-dev nettle-dev \
+            libgcrypt20-dev libwolfssl-dev libnss3-dev
 
       - name: Environment fingerprint (raw)
         run: |
@@ -98,6 +118,11 @@ jobs:
           echo "== php"; php --version
           echo "== bun"; bun --version
           echo "== zig"; zig version
+          echo "== odin"; odin version || true
+          echo "== dotnet"; dotnet --version || true
+          echo "== wasmtime"; wasmtime --version || true
+          echo "== botan"; pkg-config --modversion botan-3 2>/dev/null || pkg-config --modversion botan-2 || true
+          echo "== nettle"; pkg-config --modversion nettle || true
           true
 
       - name: Sync harness

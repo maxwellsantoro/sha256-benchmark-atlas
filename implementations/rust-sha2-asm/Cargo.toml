@@ -1,0 +1,11 @@
+[package]
+name = "sha256_runner_asm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sha2 = { version = "0.10", features = ["asm"] }
+
+[[bin]]
+name = "sha256_runner"
+path = "src/main.rs"

@@ -107,8 +107,8 @@ of percent for every ahead-of-time implementation, so a large residual is a real
 signal. It flags exactly the tiered runtimes and nothing else:
 
 ```text
-java-jdk           75% at 4096 B      node-crypto        25% at 4096 B
-java-bouncycastle  27% at 4096 B      bun-crypto         13% at 4096 B
+java-jdk           69% at 4096 B      node-crypto        23% at 4096 B
+java-bouncycastle  22% at 4096 B      bun-crypto         11% at 4096 B
 ```
 
 That is a runtime which never reached steady state at that size, not a property of
@@ -218,7 +218,7 @@ Computed per architecture and message size in `summary.json` under
 
 ## Quick start
 
-Requires: `uv`, a C compiler, OpenSSL headers (`libssl-dev` / Homebrew `openssl`), Rust (`cargo`), Go, Node, Java JDK.
+Requires: `uv`, a C compiler, OpenSSL headers (`libssl-dev` / Homebrew `openssl`), Rust (`cargo`), Go, Node, Java JDK. Optional for the expanded kernel set: Botan, Crypto++, Nettle, Libgcrypt, wolfSSL, NSS, Odin, .NET 8, Wasmtime, Zig (for the wasm guest).
 
 On macOS with Homebrew OpenSSL:
 
@@ -245,7 +245,7 @@ uv run sha256-atlas summarize results/latest/blocks/*/bench.json.gz --markdown
 2. Register it in `registry/implementations.yaml` with provenance, backend, and status
 3. Open a PR — CI builds, verifies, and benches it interleaved with the rest
 
-Currently admitted: **19** implementations across C, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, Java, and Zig — spanning OpenSSL, BoringSSL, libsodium, mbedTLS, ring, RustCrypto, Bouncy Castle, Go stdlib, Zig stdlib, and reference paths.
+Currently admitted: **29** implementations (plus LibreSSL discovered, CryptoKit Apple-only) across C/C++, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, Java, Zig, Odin, C#, and Wasm — spanning OpenSSL, BoringSSL, LibreSSL, Botan, Crypto++, Nettle, Libgcrypt, wolfSSL, NSS, libsodium, mbedTLS, ring, RustCrypto (+asm), Bouncy Castle, Go/Zig/Odin stdlibs, .NET platform crypto, and portable/reference paths.
 
 ## Correctness and its oracle
 
@@ -253,8 +253,8 @@ The gate runs 10,021 cases: NIST/FIPS vectors, padding-boundary messages, and PR
 messages up to 4 KiB. Only the **5 NIST vectors are externally published ground
 truth**; the rest are checked against `hashlib`, which is itself usually OpenSSL, so
 they cannot detect an error shared with the oracle. The independent evidence is
-unanimity: 19 implementations across 12 distinct backends agreeing digest-for-digest
-on every case. `correctness.json` states this split explicitly rather than implying
+unanimity across admitted implementations and distinct backends agreeing
+digest-for-digest on every case. `correctness.json` states this split explicitly rather than implying
 independence it doesn't have.
 
 ## Claims this repo will and will not make

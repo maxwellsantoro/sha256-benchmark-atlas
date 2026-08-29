@@ -384,3 +384,216 @@ implementations:
     java_cp: implementations/java-bouncycastle/bcprov.jar
     interpreter: java
     java_main: Sha256Runner
+
+  # --- New kernels / substrates (distinct underneath) ---------------------
+
+  - id: odin-std
+    language: odin
+    project: odin-lang/Odin
+    package: core:crypto/sha2
+    version: system
+    version_resolved_from: tools.odin
+    source_commit: null
+    implementation_class: native
+    backend: odin-sha2
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: >
+      Odin stdlib SHA-256 with first-party Intel SHA-NI and ARMv8 crypto paths
+      (sha256_impl_hw_intel / sha256_impl_hw_arm) plus portable fallback.
+    build: make -C implementations/odin-std
+    binary: implementations/odin-std/sha256_runner
+
+  - id: rust-sha2-asm
+    language: rust
+    project: RustCrypto/hashes
+    package: sha2
+    version: "0.10+asm"
+    version_resolved_from: null
+    source_commit: null
+    implementation_class: native
+    backend: rustcrypto-asm
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: >
+      Same RustCrypto sha2 crate as rust-sha2, built with the `asm` feature so
+      ARMv8 crypto extensions are included (controls the measured aarch64 cliff).
+    hardware_acceleration_by_arch:
+      x86_64: sha-ni
+      aarch64: armv8-crypto
+    build: cargo build --release --manifest-path implementations/rust-sha2-asm/Cargo.toml
+    binary: implementations/rust-sha2-asm/target/release/sha256_runner
+
+  - id: c-botan
+    language: c
+    project: randombit/botan
+    package: libbotan
+    version: system
+    version_resolved_from: libraries.botan
+    source_commit: null
+    implementation_class: production
+    backend: botan
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: Botan FFI SHA-256 (own C++ crypto library with SHA-NI / ARMv8 paths).
+    build: make -C implementations/c-botan
+    binary: implementations/c-botan/sha256_runner
+
+  - id: c-cryptopp
+    language: c++
+    project: weidai11/cryptopp
+    package: libcryptopp
+    version: system
+    version_resolved_from: libraries.cryptopp
+    source_commit: null
+    implementation_class: production
+    backend: cryptopp
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: Crypto++ SHA256 (own SHA-NI / ARMv8 / POWER providers).
+    build: make -C implementations/c-cryptopp
+    binary: implementations/c-cryptopp/sha256_runner
+
+  - id: c-nettle
+    language: c
+    project: gnunettle/nettle
+    package: libnettle
+    version: system
+    version_resolved_from: libraries.nettle
+    source_commit: null
+    implementation_class: production
+    backend: nettle
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: GNU Nettle sha256 (used under GnuTLS).
+    build: make -C implementations/c-nettle
+    binary: implementations/c-nettle/sha256_runner
+
+  - id: c-libgcrypt
+    language: c
+    project: gpg/libgcrypt
+    package: libgcrypt
+    version: system
+    version_resolved_from: libraries.libgcrypt
+    source_commit: null
+    implementation_class: production
+    backend: libgcrypt
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: Libgcrypt GCRY_MD_SHA256 (GnuPG stack).
+    build: make -C implementations/c-libgcrypt
+    binary: implementations/c-libgcrypt/sha256_runner
+
+  - id: c-wolfssl
+    language: c
+    project: wolfSSL/wolfssl
+    package: libwolfssl
+    version: system
+    version_resolved_from: libraries.wolfssl
+    source_commit: null
+    implementation_class: production
+    backend: wolfssl
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: wolfSSL wolfcrypt SHA-256.
+    build: make -C implementations/c-wolfssl
+    binary: implementations/c-wolfssl/sha256_runner
+
+  - id: c-nss
+    language: c
+    project: nss-dev/nss
+    package: libnss3
+    version: system
+    version_resolved_from: libraries.nss
+    source_commit: null
+    implementation_class: production
+    backend: nss
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production, native]
+    notes: Mozilla NSS HASH_HashBuf(SHA-256).
+    build: make -C implementations/c-nss
+    binary: implementations/c-nss/sha256_runner
+
+  - id: c-libressl
+    language: c
+    project: libressl/portable
+    package: libressl-libcrypto
+    version: system
+    version_resolved_from: libraries.libressl
+    source_commit: null
+    implementation_class: production
+    backend: libressl
+    hardware_acceleration: auto
+    status: discovered
+    leaderboards: [production]
+    notes: >
+      LibreSSL libcrypto via EVP (OpenSSL-compatible API, distinct binary from
+      stock OpenSSL). Discovered until CI can supply LibreSSL without colliding
+      with the system OpenSSL used by other runners — set LIBRESSL_PREFIX to build.
+    build: make -C implementations/c-libressl
+    binary: implementations/c-libressl/sha256_runner
+
+  - id: csharp-dotnet
+    language: csharp
+    project: dotnet/runtime
+    package: System.Security.Cryptography
+    version: "8.0"
+    version_resolved_from: tools.dotnet
+    source_commit: null
+    implementation_class: production
+    backend: dotnet-crypto
+    hardware_acceleration: auto
+    status: admitted
+    leaderboards: [production]
+    notes: >
+      .NET SHA256.HashData — platform provider (CNG on Windows, OpenSSL on Linux,
+      CommonCrypto on macOS). Interesting dispatch story across OSes.
+    build: bash implementations/csharp-dotnet/build.sh
+    binary: implementations/csharp-dotnet/sha256_runner
+    audit_note: "Managed entrypoint; native crypto lives in the runtime / OS provider."
+
+  - id: swift-cryptokit
+    language: swift
+    project: apple/swift-crypto
+    package: CryptoKit
+    version: system
+    version_resolved_from: tools.swift
+    source_commit: null
+    implementation_class: production
+    backend: cryptokit
+    hardware_acceleration: auto
+    status: unsupported_platform
+    leaderboards: [production, native]
+    notes: >
+      Apple CryptoKit SHA256 (CommonCrypto). Requires Apple platforms; Linux
+      campaign runners cannot build it.
+    build: make -C implementations/swift-cryptokit
+    binary: implementations/swift-cryptokit/sha256_runner
+    audit_note: "Apple platform frameworks; audit on macOS only."
+
+  - id: wasm-portable
+    language: c
+    project: local/wasm-portable
+    package: null
+    version: "1.0"
+    version_resolved_from: null
+    source_commit: null
+    implementation_class: portable
+    backend: wasm-portable
+    hardware_acceleration: none
+    status: admitted
+    leaderboards: [portable, reference]
+    notes: >
+      Portable FIPS-style SHA-256 (same algorithm as c-ref) compiled to wasm32-wasi
+      via zig cc and run under Wasmtime — different execution substrate.
+    build: make -C implementations/wasm-portable
+    binary: implementations/wasm-portable/sha256_runner
+    audit_note: "WebAssembly module; no native SHA opcodes in the guest by construction."

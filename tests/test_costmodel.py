@@ -145,6 +145,39 @@ def test_a_consistently_slow_size_is_still_flagged() -> None:
     assert agg["steady_state_residual_size"] == 4096
 
 
+def test_steady_state_residual_matches_median_residuals_table() -> None:
+    """Top-level steady_state_* must agree with residuals_by_size for that size.
+
+    A stale summary once reported worst-block residuals in steady_state_residual
+    while residuals_by_size held the median-across-blocks table — two answers in
+    one object. Keep them locked together.
+    """
+    models = []
+    for _ in range(10):
+        data = synthetic(1200.0, 45.0)
+        data[4096] *= 1.5
+        models.append(fit_cost_model(data))
+
+    agg = aggregate_models([m for m in models if m])
+    assert agg is not None
+    size = agg["steady_state_residual_size"]
+    assert size == 4096
+    assert abs(agg["steady_state_residual"] - abs(agg["residuals_by_size"][str(size)])) < 1e-12
+
+    # Same lock must hold when one noisy block would disagree with the median.
+    clean = [fit_cost_model(synthetic(30.0, 40.0)) for _ in range(9)]
+    noisy = synthetic(30.0, 40.0)
+    noisy[4096] *= 1.9
+    mixed = aggregate_models([m for m in [*clean, fit_cost_model(noisy)] if m])
+    assert mixed is not None
+    mixed_size = mixed["steady_state_residual_size"]
+    if mixed_size is not None:
+        assert (
+            abs(mixed["steady_state_residual"] - abs(mixed["residuals_by_size"][str(mixed_size)]))
+            < 1e-12
+        )
+
+
 # --- degenerate input -----------------------------------------------------
 
 

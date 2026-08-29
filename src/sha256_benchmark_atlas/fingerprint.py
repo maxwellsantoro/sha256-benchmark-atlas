@@ -116,12 +116,81 @@ def collect_library_versions() -> dict[str, str | None]:
     """
     out: dict[str, str | None] = {}
 
+    def _pkg_version(name: str) -> str | None:
+        try:
+            r = subprocess.run(
+                ["pkg-config", "--modversion", name],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+            return None
+        if r.returncode != 0:
+            return None
+        version = (r.stdout or "").strip().splitlines()
+        if not version:
+            return None
+        line = version[0].strip()
+        if not line or line.startswith("<") or "not found" in line.lower():
+            return None
+        return line
+
     if shutil.which("pkg-config"):
-        for name in ("libcrypto", "libsodium", "mbedcrypto"):
-            version = _first_line(_run(["pkg-config", "--modversion", name]))
-            out[name] = version if version and not version.startswith("<") else None
+        for name in (
+            "libcrypto",
+            "libsodium",
+            "mbedcrypto",
+            "botan-3",
+            "botan-2",
+            "libcrypto++",
+            "cryptopp",
+            "nettle",
+            "libgcrypt",
+            "wolfssl",
+            "nss",
+            "libressl",
+        ):
+            version = _pkg_version(name)
+            if not version:
+                continue
+            key = {
+                "botan-3": "botan",
+                "botan-2": "botan",
+                "libcrypto++": "cryptopp",
+                "cryptopp": "cryptopp",
+            }.get(name, name)
+            # Prefer the first successful alias (botan-3 before botan-2, etc.).
+            out.setdefault(key, version)
+        for missing in (
+            "libcrypto",
+            "libsodium",
+            "mbedcrypto",
+            "botan",
+            "cryptopp",
+            "nettle",
+            "libgcrypt",
+            "wolfssl",
+            "nss",
+            "libressl",
+        ):
+            out.setdefault(missing, None)
     else:
-        out.update({"libcrypto": None, "libsodium": None, "mbedcrypto": None})
+        out.update(
+            {
+                "libcrypto": None,
+                "libsodium": None,
+                "mbedcrypto": None,
+                "botan": None,
+                "cryptopp": None,
+                "nettle": None,
+                "libgcrypt": None,
+                "wolfssl": None,
+                "nss": None,
+                "libressl": None,
+            }
+        )
 
     out["python-cryptography"] = (
         _first_line(
@@ -231,6 +300,10 @@ def collect_fingerprint() -> dict[str, Any]:
         "php": ["php", "--version"],
         "bun": ["bun", "--version"],
         "zig": ["zig", "version"],
+        "odin": ["odin", "version"],
+        "dotnet": ["dotnet", "--version"],
+        "swift": ["swift", "--version"],
+        "wasmtime": ["wasmtime", "--version"],
     }
     for name, cmd in tool_cmds.items():
         if shutil.which(cmd[0]) is None:
