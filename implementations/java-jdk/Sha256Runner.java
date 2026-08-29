@@ -70,11 +70,22 @@ public class Sha256Runner {
         }
     }
 
+    // Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+    // tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+    // same time far too many iterations for a multi-second software hash of a large
+    // buffer. Every runner in this atlas uses the same two numbers.
+    static final long WARMUP_BUDGET_NS = 200_000_000L; // 200 ms
+    static final long WARMUP_MAX_ITERS = 100_000L;
+
     static void cmdBench(int size, long iters, long seed) throws Exception {
         MessageDigest md = newDigest();
         byte[] buf = fillBuf(size, seed);
         String last = digestHex(md, buf);
-        for (int i = 0; i < 3; i++) last = digestHex(md, buf);
+        long w0 = System.nanoTime();
+        for (long w = 0; w < WARMUP_MAX_ITERS; w++) {
+            last = digestHex(md, buf);
+            if (System.nanoTime() - w0 >= WARMUP_BUDGET_NS) break;
+        }
         long t0 = System.nanoTime();
         for (long i = 0; i < iters; i++) last = digestHex(md, buf);
         long ns = System.nanoTime() - t0;

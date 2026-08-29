@@ -60,6 +60,23 @@ def main(argv: list[str] | None = None) -> int:
     p_sum = sub.add_parser("summarize", help="Summarize one or more bench result JSON files")
     p_sum.add_argument("paths", nargs="+", type=Path)
     p_sum.add_argument("-o", "--output", type=Path, default=None)
+    p_sum.add_argument(
+        "--markdown",
+        action="store_true",
+        help="Print a compact Markdown digest instead of raw JSON",
+    )
+    p_sum.add_argument(
+        "--fail-on-digest-disagreement",
+        action="store_true",
+        help="Exit non-zero if any timed-path digest disagreement is present",
+    )
+
+    p_arch = sub.add_parser(
+        "archive",
+        help="Store raw per-block observations as the committed evidence archive",
+    )
+    p_arch.add_argument("block_dirs", nargs="+", type=Path)
+    p_arch.add_argument("-o", "--output-dir", type=Path, required=True)
 
     args = parser.parse_args(argv)
     root = args.root or repo_root()
@@ -131,16 +148,34 @@ def main(argv: list[str] | None = None) -> int:
             shards=args.shards,
         )
 
-    if args.cmd == "summarize":
-        from .analysis import summarize_files
-
-        summary = summarize_files(args.paths)
+    if args.cmd == "archive":
         import json
 
-        text = json.dumps(summary, indent=2)
+        from .archive import archive_blocks
+
+        manifest = archive_blocks(args.block_dirs, args.output_dir)
+        print(json.dumps(manifest, indent=2))
+        return 0 if manifest["block_count"] else 1
+
+    if args.cmd == "summarize":
+        import json
+
+        from .analysis import render_markdown, summarize_files
+
+        summary = summarize_files(args.paths, root=root)
         if args.output:
-            args.output.write_text(text + "\n", encoding="utf-8")
-        print(text)
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+        print(render_markdown(summary) if args.markdown else json.dumps(summary, indent=2))
+
+        agreement = summary["digest_agreement"]
+        if args.fail_on_digest_disagreement and not agreement["ok"]:
+            print(
+                f"FAIL: {agreement['disagreement_count']} timed-path digest "
+                "disagreement(s); benchmark measurements are not trustworthy.",
+                file=sys.stderr,
+            )
+            return 1
         return 0
 
     return 2

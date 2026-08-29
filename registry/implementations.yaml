@@ -6,6 +6,8 @@
 
 schema_version: 1
 
+# Every size here is exercised by a default campaign (--max-size defaults to the
+# largest entry). Do not add a size the campaign will not actually run.
 message_sizes_bytes:
   - 0
   - 1
@@ -24,7 +26,6 @@ message_sizes_bytes:
   - 4096
   - 65536
   - 1048576
-  - 16777216
 
 leaderboards:
   - id: production
@@ -44,6 +45,7 @@ implementations:
     project: openssl/openssl
     package: libcrypto
     version: system
+    version_resolved_from: libraries.libcrypto
     source_commit: null
     implementation_class: production
     backend: openssl
@@ -59,6 +61,7 @@ implementations:
     project: local/reference
     package: null
     version: "1.0"
+    version_resolved_from: null
     source_commit: null
     implementation_class: reference
     backend: reference-c
@@ -74,13 +77,21 @@ implementations:
     project: RustCrypto/hashes
     package: sha2
     version: "0.10"
+    version_resolved_from: null
     source_commit: null
     implementation_class: native
     backend: rustcrypto
     hardware_acceleration: auto
     status: admitted
     leaderboards: [production, native]
-    notes: RustCrypto sha2 crate; may dispatch to SHA-NI / asm where available.
+    notes: RustCrypto sha2 crate; dispatches to SHA-NI on x86_64.
+    hardware_acceleration_by_arch:
+      x86_64: sha-ni
+      aarch64: none
+    known_limitations:
+      - "Measured 3.8x slower than the accelerated cohort on aarch64 (campaign
+        33234020231): the crate needs its `asm` feature for ARMv8 crypto
+        extensions, so the default stable build falls back to portable code."
     build: cargo build --release --manifest-path implementations/rust-sha2/Cargo.toml
     binary: implementations/rust-sha2/target/release/sha256_runner
 
@@ -89,6 +100,7 @@ implementations:
     project: golang/go
     package: crypto/sha256
     version: go-toolchain
+    version_resolved_from: tools.go
     source_commit: null
     implementation_class: native
     backend: go-stdlib
@@ -104,6 +116,7 @@ implementations:
     project: python/cpython
     package: hashlib
     version: runtime
+    version_resolved_from: libraries.libcrypto
     source_commit: null
     implementation_class: production
     backend: openssl
@@ -120,6 +133,7 @@ implementations:
     project: local/pure
     package: null
     version: "1.0"
+    version_resolved_from: null
     source_commit: null
     implementation_class: pure-language
     backend: pure-python
@@ -137,6 +151,7 @@ implementations:
     project: nodejs/node
     package: node:crypto
     version: runtime
+    version_resolved_from: tools.node
     source_commit: null
     implementation_class: production
     backend: openssl
@@ -153,6 +168,7 @@ implementations:
     project: openjdk
     package: java.security.MessageDigest
     version: runtime
+    version_resolved_from: tools.java
     source_commit: null
     implementation_class: native
     backend: jdk-provider
@@ -170,6 +186,7 @@ implementations:
     project: briansmith/ring
     package: ring
     version: "0.17"
+    version_resolved_from: null
     source_commit: null
     implementation_class: native
     backend: ring
@@ -185,6 +202,7 @@ implementations:
     project: sfackler/rust-openssl
     package: openssl
     version: "0.10"
+    version_resolved_from: libraries.libcrypto
     source_commit: null
     implementation_class: production
     backend: openssl
@@ -200,6 +218,7 @@ implementations:
     project: jedisct1/libsodium
     package: libsodium
     version: system
+    version_resolved_from: libraries.libsodium
     source_commit: null
     implementation_class: production
     backend: libsodium
@@ -215,6 +234,7 @@ implementations:
     project: Mbed-TLS/mbedtls
     package: mbedcrypto
     version: system
+    version_resolved_from: libraries.mbedcrypto
     source_commit: null
     implementation_class: native
     backend: mbedtls
@@ -230,6 +250,7 @@ implementations:
     project: ruby/openssl
     package: openssl
     version: runtime
+    version_resolved_from: tools.ruby
     source_commit: null
     implementation_class: production
     backend: openssl
@@ -246,6 +267,7 @@ implementations:
     project: php/php-src
     package: hash
     version: runtime
+    version_resolved_from: tools.php
     source_commit: null
     implementation_class: production
     backend: php-hash-ext
@@ -262,6 +284,7 @@ implementations:
     project: pyca/cryptography
     package: cryptography
     version: runtime
+    version_resolved_from: libraries.python-cryptography
     source_commit: null
     implementation_class: production
     backend: openssl
@@ -278,6 +301,7 @@ implementations:
     project: oven-sh/bun
     package: bun:crypto
     version: runtime
+    version_resolved_from: tools.bun
     source_commit: null
     implementation_class: production
     backend: boringssl
@@ -294,6 +318,7 @@ implementations:
     project: ziglang/zig
     package: std.crypto.hash.sha2
     version: "0.14"
+    version_resolved_from: tools.zig
     source_commit: null
     implementation_class: native
     backend: zig-stdlib
@@ -301,6 +326,13 @@ implementations:
     status: admitted
     leaderboards: [production, native]
     notes: Zig standard library Sha256.
+    hardware_acceleration_by_arch:
+      x86_64: sha-ni
+      aarch64: none
+    known_limitations:
+      - "Measured 4.3x slower than the accelerated cohort on aarch64 (campaign
+        33234020231); the 0.14 std implementation has no ARMv8 crypto-extension
+        path."
     build: zig build --build-file implementations/zig-std/build.zig -Doptimize=ReleaseFast
     binary: implementations/zig-std/zig-out/bin/sha256_runner
 
@@ -309,6 +341,7 @@ implementations:
     project: sodiumoxide/sodiumoxide
     package: sodiumoxide
     version: "0.2"
+    version_resolved_from: libraries.libsodium
     source_commit: null
     implementation_class: production
     backend: libsodium
@@ -324,6 +357,7 @@ implementations:
     project: bcgit/bc-java
     package: bcprov-jdk18on
     version: "1.78"
+    version_resolved_from: null
     source_commit: null
     implementation_class: native
     backend: bouncycastle

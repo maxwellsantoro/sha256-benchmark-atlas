@@ -1,1 +1,28 @@
-{"run_id":33234020231,"run_url":"https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/33234020231","completed_at":"2026-08-29T04:40:41Z","blocks":12,"shards":"0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)","reps":5,"cases":10000,"max_size_bytes":1048576}
+{
+  "run_id": 33234020231,
+  "run_url": "https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/33234020231",
+  "completed_at": "2026-08-29T04:40:41Z",
+  "blocks": 12,
+  "shards": "0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)",
+  "reps": 5,
+  "cases": 10000,
+  "max_size_bytes": 1048576,
+  "summary_schema_version": 2,
+  "aggregated_at": "2026-08-29T00:00:00Z",
+  "aggregation_note": "Re-aggregated from the archived raw blocks in results/latest/blocks/ under summary schema 2, which stratifies by architecture and forms on-machine ratios within each block. The previous schema-1 summary pooled 10 x86_64 and 2 aarch64 blocks into single medians; those numbers are superseded.",
+  "host_population": {
+    "x86_64": {
+      "blocks": 10,
+      "cpu_models": [
+        "AMD EPYC 7763 64-Core Processor",
+        "AMD EPYC 9V45 96-Core Processor",
+        "AMD EPYC 9V74 80-Core Processor",
+        "INTEL(R) XEON(R) PLATINUM 8573C"
+      ]
+    },
+    "aarch64": {
+      "blocks": 2,
+      "cpu_models": ["Neoverse-N2"]
+    }
+  }
+}

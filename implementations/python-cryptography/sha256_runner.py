@@ -43,11 +43,22 @@ def cmd_verify() -> None:
         print(digest_bytes(data).hex(), flush=True)
 
 
+# Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+# tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+# same time far too many iterations for a multi-second software hash of a large
+# buffer. Every runner in this atlas uses the same two numbers.
+WARMUP_BUDGET_NS = 200_000_000  # 200 ms
+WARMUP_MAX_ITERS = 100_000
+
+
 def cmd_bench(size: int, iters: int, seed: int) -> None:
     buf = fill_buf(size, seed)
     last = digest_bytes(buf)
-    for _ in range(3):
+    w0 = time.perf_counter_ns()
+    for _ in range(WARMUP_MAX_ITERS):
         last = digest_bytes(buf)
+        if time.perf_counter_ns() - w0 >= WARMUP_BUDGET_NS:
+            break
     t0 = time.perf_counter_ns()
     for _ in range(iters):
         last = digest_bytes(buf)

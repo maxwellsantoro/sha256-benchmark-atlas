@@ -37,10 +37,21 @@ def cmd_verify
   end
 end
 
+# Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+# tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+# same time far too many iterations for a multi-second software hash of a large
+# buffer. Every runner in this atlas uses the same two numbers.
+WARMUP_BUDGET_NS = 200_000_000 # 200 ms
+WARMUP_MAX_ITERS = 100_000
+
 def cmd_bench(size, iters, seed)
   buf = fill_buf(size, seed)
   last = digest_hex(buf)
-  3.times { last = digest_hex(buf) }
+  w0 = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
+  WARMUP_MAX_ITERS.times do
+    last = digest_hex(buf)
+    break if Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - w0 >= WARMUP_BUDGET_NS
+  end
   t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond)
   iters.times { last = digest_hex(buf) }
   ns = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) - t0

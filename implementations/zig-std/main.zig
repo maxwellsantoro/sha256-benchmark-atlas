@@ -60,6 +60,13 @@ fn cmdVerify(allocator: std.mem.Allocator) !void {
     }
 }
 
+// Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+// tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+// same time far too many iterations for a multi-second software hash of a large
+// buffer. Every runner in this atlas uses the same two numbers.
+const warmup_budget_ns: i128 = 200_000_000; // 200 ms
+const warmup_max_iters: u64 = 100_000;
+
 fn cmdBench(allocator: std.mem.Allocator, size: usize, iters: u64, seed: u64) !void {
     const buf = try allocator.alloc(u8, if (size == 0) 1 else size);
     defer allocator.free(buf);
@@ -67,8 +74,12 @@ fn cmdBench(allocator: std.mem.Allocator, size: usize, iters: u64, seed: u64) !v
     if (size > 0) fillBuf(buf[0..size], seed);
     var hexbuf: [64]u8 = undefined;
     var last = digestHex(slice, &hexbuf);
-    var i: u32 = 0;
-    while (i < 3) : (i += 1) last = digestHex(slice, &hexbuf);
+    const w0 = std.time.nanoTimestamp();
+    var i: u64 = 0;
+    while (i < warmup_max_iters) : (i += 1) {
+        last = digestHex(slice, &hexbuf);
+        if (std.time.nanoTimestamp() - w0 >= warmup_budget_ns) break;
+    }
     const t0 = std.time.nanoTimestamp();
     var j: u64 = 0;
     while (j < iters) : (j += 1) last = digestHex(slice, &hexbuf);

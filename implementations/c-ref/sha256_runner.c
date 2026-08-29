@@ -7,6 +7,13 @@
 #include <string.h>
 #include <time.h>
 
+/* Warm up on a time budget instead of a fixed iteration count. A constant 3 leaves
+ * tiered/JIT runtimes in the interpreter for much of the timed loop, and is at the
+ * same time far too many iterations for a multi-second software hash of a large
+ * buffer. Every runner in this atlas uses the same two numbers. */
+#define WARMUP_BUDGET_NS 200000000ULL /* 200 ms */
+#define WARMUP_MAX_ITERS 100000ULL
+
 static const uint32_t K[64] = {
     0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
     0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
@@ -183,7 +190,11 @@ static int cmd_bench(size_t size, uint64_t iters, uint64_t seed) {
     unsigned char digest[32];
     if (!buf && size) return 1;
     fill_buf(buf, size, seed);
-    for (int i = 0; i < 3; i++) do_hash(buf, size, digest);
+    uint64_t w0 = now_ns();
+    for (uint64_t w = 0; w < WARMUP_MAX_ITERS; w++) {
+        do_hash(buf, size, digest);
+        if (now_ns() - w0 >= WARMUP_BUDGET_NS) break;
+    }
     uint64_t t0 = now_ns();
     for (uint64_t i = 0; i < iters; i++) do_hash(buf, size, digest);
     uint64_t t1 = now_ns();

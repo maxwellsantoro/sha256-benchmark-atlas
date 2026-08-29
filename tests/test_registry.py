@@ -70,6 +70,49 @@ def test_by_id_unknown_id_raises(tmp_path: Path) -> None:
         reg.by_id(["a-admitted", "nope"])
 
 
+def test_registry_sizes_are_all_exercised_by_a_default_campaign() -> None:
+    """A size the campaign never runs implies a claim the atlas does not make."""
+    import inspect
+
+    from sha256_benchmark_atlas.campaign import run_campaign
+
+    default_max = inspect.signature(run_campaign).parameters["max_size"].default
+    reg = load_registry(repo_root())
+    assert reg.message_sizes, "registry declares no message sizes"
+    assert max(reg.message_sizes) == default_max, (
+        f"largest registry size {max(reg.message_sizes)} != campaign default "
+        f"max_size {default_max}; one of the two is wrong"
+    )
+
+
+def test_version_provenance_points_at_real_fingerprint_keys() -> None:
+    """`version_resolved_from` must name a key a fingerprint actually produces."""
+    from sha256_benchmark_atlas.fingerprint import collect_fingerprint
+
+    fp = collect_fingerprint()
+    reg = load_registry(repo_root())
+
+    for impl in reg.implementations(admitted_only=False):
+        key = impl.raw.get("version_resolved_from")
+        if key is None:
+            continue
+        section, _, name = str(key).partition(".")
+        assert section in fp, f"{impl.id}: unknown fingerprint section {section!r}"
+        assert name in fp[section], (
+            f"{impl.id}: fingerprint section {section!r} has no key {name!r}"
+        )
+
+
+def test_every_admitted_implementation_declares_provenance() -> None:
+    reg = load_registry(repo_root())
+    for impl in reg.implementations():
+        assert impl.raw.get("version"), f"{impl.id} has no version"
+        assert impl.raw.get("backend"), f"{impl.id} has no backend"
+        assert "version_resolved_from" in impl.raw, (
+            f"{impl.id}: state where the version comes from, or null for a hard pin"
+        )
+
+
 def test_real_registry_ids_are_unique_and_admitted() -> None:
     """Sanity-check the actual project registry, not just fixtures."""
     root = repo_root()

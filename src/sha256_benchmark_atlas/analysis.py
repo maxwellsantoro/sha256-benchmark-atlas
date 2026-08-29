@@ -1,15 +1,46 @@
+"""Aggregation for campaign results.
+
+Two rules shape everything here:
+
+1. **Never pool across architectures.** A median taken over 10 x86_64 blocks and
+   2 aarch64 blocks describes no machine that exists. Implementations whose
+   acceleration is arch-dependent (see `arch_sensitivity`) are misreported by
+   several-fold when pooled.
+2. **Never discard block identity.** The interleaved design exists so that
+   T_A/T_B can be formed *within* one host, where host-to-host speed variation
+   cancels. That requires pairing inside a block; a ratio of two pooled medians
+   is not the same quantity and supports none of the claims the atlas makes.
+"""
+
 from __future__ import annotations
 
+import gzip
 import json
 import statistics
 from collections import defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
 
+from .fingerprint import cpu_facts_from_fingerprint
 
-def _load_bench(path: Path) -> dict[str, Any]:
+SCHEMA_VERSION = 2
+
+# Preference order; the first one present in a block becomes that block's baseline.
+BASELINE_PREFERENCE = ("c-openssl", "rust-sha2", "go-stdlib")
+
+# An implementation is flagged as arch-sensitive when its cross-arch ratio departs
+# from the cohort's by this factor — i.e. it gains or loses acceleration that its
+# peers on the same two hosts do not.
+ARCH_SENSITIVITY_FACTOR = 2.0
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    if path.suffix == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8") as f:
+            return json.load(f)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -20,130 +51,588 @@ def _find_root(start: Path) -> Path | None:
     return None
 
 
-def _load_backends(root: Path | None) -> dict[str, str]:
+@dataclass
+class RegistryMeta:
+    backends: dict[str, str] = field(default_factory=dict)
+    boards: dict[str, list[str]] = field(default_factory=dict)
+    board_descriptions: dict[str, str] = field(default_factory=dict)
+    impl_class: dict[str, str] = field(default_factory=dict)
+
+
+def _load_registry_meta(root: Path | None) -> RegistryMeta:
     if root is None:
-        return {}
+        return RegistryMeta()
     data = yaml.safe_load((root / "registry" / "implementations.yaml").read_text(encoding="utf-8"))
-    out: dict[str, str] = {}
+    meta = RegistryMeta()
+    for board in data.get("leaderboards", []):
+        meta.board_descriptions[str(board["id"])] = str(board.get("description", ""))
     for item in data.get("implementations", []):
-        out[str(item["id"])] = str(item.get("backend", "unknown"))
+        iid = str(item["id"])
+        meta.backends[iid] = str(item.get("backend", "unknown"))
+        meta.boards[iid] = [str(b) for b in (item.get("leaderboards") or [])]
+        meta.impl_class[iid] = str(item.get("implementation_class", "unknown"))
+    return meta
+
+
+@dataclass
+class Block:
+    """One experimental block: all implementations benched on one host."""
+
+    block_id: str
+    path: str
+    arch: str
+    cpu_model: str | None
+    sha256_hw: bool | None
+    openssl: str | None
+    observations: list[dict[str, Any]]
+
+    def medians(self) -> dict[tuple[str, int], float]:
+        """Median ns/hash per (impl, size) within this block, across its reps."""
+        acc: dict[tuple[str, int], list[float]] = defaultdict(list)
+        for o in self.observations:
+            if o.get("ok"):
+                acc[(str(o["impl"]), int(o["size"]))].append(float(o["ns_per_hash"]))
+        return {k: statistics.median(v) for k, v in acc.items() if v}
+
+
+def _block_arch(path: Path, data: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Resolve a block's architecture and host facts.
+
+    Preference: the bench file's own record, then a sibling fingerprint.json, then
+    the directory name. Anything unresolved is reported as "unknown" rather than
+    being folded into a default, so a mislabelled block cannot silently join the
+    wrong stratum.
+    """
+    host: dict[str, Any] = dict(data.get("host") or {})
+    arch = str(host.get("arch") or "") or None
+
+    fp_path = next(
+        (
+            p
+            for p in (path.parent / "fingerprint.json", path.parent / "fingerprint.json.gz")
+            if p.is_file()
+        ),
+        path.parent / "fingerprint.json",
+    )
+    if fp_path.is_file():
+        try:
+            fp = _read_json(fp_path)
+        except (OSError, ValueError):
+            fp = {}
+        if fp:
+            facts = cpu_facts_from_fingerprint(fp)
+            arch = arch or facts["arch"]
+            if host.get("cpu_model") is None:
+                host["cpu_model"] = facts["model_name"]
+            if host.get("sha256_hw") is None:
+                host["sha256_hw"] = facts["sha256_hw"]
+            host.setdefault("openssl", (fp.get("tools") or {}).get("openssl"))
+
+    if not arch:
+        name = path.parent.name.lower()
+        if "arm" in name or "aarch64" in name:
+            arch = "aarch64"
+        elif "x64" in name or "x86" in name or "ubuntu" in name:
+            arch = "x86_64"
+
+    host["arch"] = arch or "unknown"
+    return host["arch"], host
+
+
+def load_blocks(paths: list[Path]) -> list[Block]:
+    blocks: list[Block] = []
+    for path in paths:
+        data = _read_json(path)
+        arch, host = _block_arch(path, data)
+        blocks.append(
+            Block(
+                block_id=host.get("block_id") or path.parent.name or path.stem,
+                path=str(path),
+                arch=arch,
+                cpu_model=host.get("cpu_model"),
+                sha256_hw=host.get("sha256_hw"),
+                openssl=host.get("openssl"),
+                observations=list(data.get("observations", [])),
+            )
+        )
+    return blocks
+
+
+def _dispersion(vals: list[float]) -> dict[str, Any]:
+    vals = sorted(vals)
+    n = len(vals)
+    if n == 0:
+        return {}
+    med = statistics.median(vals)
+    mean = statistics.fmean(vals)
+    if n >= 4:
+        q = statistics.quantiles(vals, n=4, method="inclusive")
+        p25, p75 = q[0], q[2]
+    else:
+        p25, p75 = vals[0], vals[-1]
+    stdev = statistics.stdev(vals) if n >= 2 else 0.0
+    return {
+        "n": n,
+        "min": vals[0],
+        "p25": p25,
+        "median": med,
+        "p75": p75,
+        "max": vals[-1],
+        "mean": mean,
+        "stdev": stdev,
+        "cv": (stdev / mean) if mean else None,
+        "iqr_ratio": (p75 / p25) if p25 else None,
+    }
+
+
+def check_timed_path_digests(observations: list[dict[str, Any]]) -> dict[str, Any]:
+    """Cross-check the digests produced *inside the timed loop*.
+
+    Every runner fills its bench buffer from the same seeded PRNG, so within one
+    block all implementations at a given (size, rep) must return the same digest.
+    The correctness gate exercises `verify`, an entirely separate code path; without
+    this check a bench loop that hashed the wrong bytes — or one the optimiser
+    hoisted away — would be timed and published unchallenged.
+    """
+    cells: dict[tuple[int, int], dict[str, str]] = defaultdict(dict)
+    for o in observations:
+        if o.get("ok") and o.get("digest"):
+            cells[(int(o["size"]), int(o["rep"]))][str(o["impl"])] = str(o["digest"])
+
+    checked = 0
+    disagreements: list[dict[str, Any]] = []
+    for (size, rep), by_impl in sorted(cells.items()):
+        if len(by_impl) < 2:
+            continue
+        checked += 1
+        counts: dict[str, int] = defaultdict(int)
+        for digest in by_impl.values():
+            counts[digest] += 1
+        if len(counts) > 1:
+            majority = max(counts, key=lambda d: counts[d])
+            disagreements.append(
+                {
+                    "size": size,
+                    "rep": rep,
+                    "majority_digest": majority,
+                    "dissenting": {i: d for i, d in sorted(by_impl.items()) if d != majority},
+                }
+            )
+    return {
+        "cells_checked": checked,
+        "disagreement_count": len(disagreements),
+        "ok": not disagreements,
+        "disagreements": disagreements[:20],
+    }
+
+
+def _check_digest_agreement(blocks: list[Block]) -> dict[str, Any]:
+    """Run the timed-path digest check across every block."""
+    checked = 0
+    disagreements: list[dict[str, Any]] = []
+    for block in blocks:
+        report = check_timed_path_digests(block.observations)
+        checked += report["cells_checked"]
+        for d in report["disagreements"]:
+            disagreements.append({"block_id": block.block_id, **d})
+    return {
+        "cells_checked": checked,
+        "disagreement_count": len(disagreements),
+        "ok": not disagreements,
+        "disagreements": disagreements[:20],
+    }
+
+
+def _rows_for_arch(
+    blocks: list[Block], meta: RegistryMeta, arch: str
+) -> list[dict[str, Any]]:
+    ns: dict[tuple[str, int], list[float]] = defaultdict(list)
+    gb: dict[tuple[str, int], list[float]] = defaultdict(list)
+    seen_blocks: dict[tuple[str, int], set[str]] = defaultdict(set)
+
+    for block in blocks:
+        for o in block.observations:
+            if not o.get("ok"):
+                continue
+            key = (str(o["impl"]), int(o["size"]))
+            ns[key].append(float(o["ns_per_hash"]))
+            gb[key].append(float(o["gb_per_s"]))
+            seen_blocks[key].add(block.block_id)
+
+    rows: list[dict[str, Any]] = []
+    for (impl, size), vals in sorted(ns.items(), key=lambda x: (x[0][1], x[0][0])):
+        d = _dispersion(vals)
+        gd = _dispersion(gb[(impl, size)])
+        rows.append(
+            {
+                "impl": impl,
+                "backend": meta.backends.get(impl),
+                "arch": arch,
+                "size": size,
+                "blocks": len(seen_blocks[(impl, size)]),
+                "n": d["n"],
+                "ns_per_hash_median": d["median"],
+                "ns_per_hash_mean": d["mean"],
+                "ns_per_hash_p25": d["p25"],
+                "ns_per_hash_p75": d["p75"],
+                "ns_per_hash_min": d["min"],
+                "ns_per_hash_max": d["max"],
+                "ns_per_hash_cv": d["cv"],
+                "gb_per_s_median": gd["median"],
+                "gb_per_s_mean": gd["mean"],
+            }
+        )
+    return rows
+
+
+def _paired_ratios(
+    blocks: list[Block], meta: RegistryMeta, arch: str
+) -> list[dict[str, Any]]:
+    """On-machine ratios: form T_impl/T_baseline inside each block, then aggregate.
+
+    This is the quantity the atlas actually claims. Dividing one pooled median by
+    another does not cancel host-to-host variation and cannot produce a win count.
+    """
+    per_block = [(b.block_id, b.medians()) for b in blocks]
+    sizes = sorted({size for _, m in per_block for _, size in m})
+
+    out: list[dict[str, Any]] = []
+    for size in sizes:
+        # Choose one baseline for the whole size so ratios stay comparable.
+        available = {impl for _, m in per_block for impl, s in m if s == size}
+        baseline = next((b for b in BASELINE_PREFERENCE if b in available), None)
+        if baseline is None:
+            continue
+
+        by_impl: dict[str, list[float]] = defaultdict(list)
+        wins: dict[str, int] = defaultdict(int)
+        totals: dict[str, int] = defaultdict(int)
+        for _bid, med in per_block:
+            base_ns = med.get((baseline, size))
+            if not base_ns:
+                continue
+            for impl in available:
+                impl_ns = med.get((impl, size))
+                if not impl_ns:
+                    continue
+                by_impl[impl].append(impl_ns / base_ns)
+                totals[impl] += 1
+                if impl_ns < base_ns:
+                    wins[impl] += 1
+
+        for impl, ratios in sorted(by_impl.items()):
+            d = _dispersion(ratios)
+            out.append(
+                {
+                    "size": size,
+                    "impl": impl,
+                    "backend": meta.backends.get(impl),
+                    "arch": arch,
+                    "baseline": baseline,
+                    "ratio_ns_median": d["median"],
+                    "ratio_ns_p25": d["p25"],
+                    "ratio_ns_p75": d["p75"],
+                    "ratio_ns_min": d["min"],
+                    "ratio_ns_max": d["max"],
+                    "blocks_faster_than_baseline": wins[impl],
+                    "blocks_compared": totals[impl],
+                }
+            )
     return out
 
 
 def _backend_clusters(
-    rows: list[dict[str, Any]],
-    backends: dict[str, str],
-    *,
-    size: int = 1_048_576,
+    rows: list[dict[str, Any]], meta: RegistryMeta, arch: str
 ) -> list[dict[str, Any]]:
-    """Summarize spread within each backend cluster at a given message size."""
-    by_backend: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    """Spread among *distinct front-ends sharing one backend*.
+
+    Single-member "clusters" are omitted: a spread of exactly 1.0 over one member
+    is not evidence of anything, and eleven such rows drown the two real ones.
+    """
+    grouped: dict[tuple[str, int], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
-        if int(row["size"]) != size:
-            continue
-        impl = str(row["impl"])
-        backend = backends.get(impl, "unknown")
-        by_backend[backend].append(row)
+        grouped[(meta.backends.get(row["impl"], "unknown"), int(row["size"]))].append(row)
 
     clusters: list[dict[str, Any]] = []
-    for backend, members in sorted(by_backend.items()):
+    for (backend, size), members in sorted(grouped.items()):
+        if len(members) < 2:
+            continue
         members_sorted = sorted(members, key=lambda r: r["ns_per_hash_median"])
         ns_vals = [float(m["ns_per_hash_median"]) for m in members_sorted]
-        gb_vals = [float(m["gb_per_s_median"]) for m in members_sorted]
-        spread = (max(ns_vals) / min(ns_vals)) if ns_vals and min(ns_vals) else None
         clusters.append(
             {
                 "backend": backend,
+                "arch": arch,
                 "size": size,
                 "members": [m["impl"] for m in members_sorted],
                 "count": len(members_sorted),
-                "ns_per_hash_median_min": min(ns_vals) if ns_vals else None,
-                "ns_per_hash_median_max": max(ns_vals) if ns_vals else None,
-                "ns_spread_ratio": spread,
-                "gb_per_s_median_best": max(gb_vals) if gb_vals else None,
-                "fastest_member": members_sorted[0]["impl"] if members_sorted else None,
+                "ns_per_hash_median_min": ns_vals[0],
+                "ns_per_hash_median_max": ns_vals[-1],
+                "ns_spread_ratio": ns_vals[-1] / ns_vals[0] if ns_vals[0] else None,
+                "fastest_member": members_sorted[0]["impl"],
+                "slowest_member": members_sorted[-1]["impl"],
             }
         )
     return clusters
 
 
-def summarize_files(paths: list[Path]) -> dict[str, Any]:
-    """Aggregate ns/hash and GB/s by (impl, size) across result files / runner blocks."""
-    by_key: dict[tuple[str, int], list[float]] = defaultdict(list)
-    by_key_gb: dict[tuple[str, int], list[float]] = defaultdict(list)
-    blocks = 0
-    root = _find_root(paths[0].resolve()) if paths else None
-    backends = _load_backends(root)
+def _leaderboards(
+    rows: list[dict[str, Any]], meta: RegistryMeta, arch: str
+) -> dict[str, Any]:
+    """Rank each registry-declared board. Previously declared and never computed."""
+    out: dict[str, Any] = {}
+    for board, description in sorted(meta.board_descriptions.items()):
+        eligible = {i for i, boards in meta.boards.items() if board in boards}
+        by_size: dict[str, list[dict[str, Any]]] = {}
+        for size in sorted({r["size"] for r in rows}):
+            subset = [r for r in rows if r["size"] == size and r["impl"] in eligible]
+            subset.sort(key=lambda r: r["ns_per_hash_median"])
+            if subset:
+                by_size[str(size)] = [
+                    {
+                        "rank": i + 1,
+                        "impl": r["impl"],
+                        "backend": r["backend"],
+                        "ns_per_hash_median": r["ns_per_hash_median"],
+                        "gb_per_s_median": r["gb_per_s_median"],
+                    }
+                    for i, r in enumerate(subset)
+                ]
+        out[board] = {"description": description, "arch": arch, "by_size": by_size}
+    return out
 
-    for path in paths:
-        data = _load_bench(path)
-        blocks += 1
-        for obs in data.get("observations", []):
-            if not obs.get("ok", False):
+
+def _arch_sensitivity(
+    rows_by_arch: dict[str, list[dict[str, Any]]],
+    sizes: list[int],
+    block_counts: dict[str, int],
+) -> list[dict[str, Any]]:
+    """Find implementations whose standing depends on the architecture.
+
+    For each size, every implementation's cross-arch ratio is compared against the
+    cohort median ratio for the same pair of hosts. An implementation that loses a
+    hardware datapath on one architecture — while its peers keep theirs — shows up
+    here as a large departure, and its pooled median would be meaningless.
+    """
+    archs = [a for a in rows_by_arch if a != "unknown"]
+    if len(archs) < 2:
+        return []
+    # Reference arch = the best-evidenced one, i.e. the most blocks. Row counts are
+    # identical across strata whenever every implementation ran everywhere, so they
+    # cannot break the tie.
+    ref = max(archs, key=lambda a: (block_counts.get(a, 0), a))
+    others = [a for a in archs if a != ref]
+
+    out: list[dict[str, Any]] = []
+    for other in others:
+        ref_map = {(r["impl"], r["size"]): r for r in rows_by_arch[ref]}
+        oth_map = {(r["impl"], r["size"]): r for r in rows_by_arch[other]}
+        for size in sizes:
+            pairs = {
+                impl: (ref_map[(impl, size)], oth_map[(impl, size)])
+                for impl, s in {(i, s) for i, s in ref_map}
+                if s == size and (impl, size) in oth_map
+            }
+            if len(pairs) < 3:
                 continue
-            key = (obs["impl"], int(obs["size"]))
-            by_key[key].append(float(obs["ns_per_hash"]))
-            by_key_gb[key].append(float(obs["gb_per_s"]))
-
-    rows: list[dict[str, Any]] = []
-    for (impl, size), vals in sorted(by_key.items(), key=lambda x: (x[0][1], x[0][0])):
-        gb = by_key_gb[(impl, size)]
-        rows.append(
-            {
-                "impl": impl,
-                "backend": backends.get(impl),
-                "size": size,
-                "n": len(vals),
-                "ns_per_hash_median": statistics.median(vals),
-                "ns_per_hash_mean": statistics.fmean(vals),
-                "gb_per_s_median": statistics.median(gb),
-                "gb_per_s_mean": statistics.fmean(gb),
+            ratios = {
+                impl: (o["ns_per_hash_median"] / r["ns_per_hash_median"])
+                for impl, (r, o) in pairs.items()
+                if r["ns_per_hash_median"]
             }
-        )
+            cohort = statistics.median(ratios.values())
+            for impl, ratio in sorted(ratios.items()):
+                departure = ratio / cohort if cohort else None
+                flagged = departure is not None and (
+                    departure >= ARCH_SENSITIVITY_FACTOR
+                    or departure <= 1 / ARCH_SENSITIVITY_FACTOR
+                )
+                if not flagged:
+                    continue
+                r, o = pairs[impl]
+                out.append(
+                    {
+                        "impl": impl,
+                        "size": size,
+                        "reference_arch": ref,
+                        "other_arch": other,
+                        "reference_ns_median": r["ns_per_hash_median"],
+                        "other_ns_median": o["ns_per_hash_median"],
+                        "ratio_other_over_reference": ratio,
+                        "cohort_ratio": cohort,
+                        "departure_from_cohort": departure,
+                        "direction": "slower" if departure and departure > 1 else "faster",
+                    }
+                )
+    return out
 
-    rankings: dict[str, list[dict[str, Any]]] = {}
-    sizes = sorted({r["size"] for r in rows})
-    for size in sizes:
-        subset = [r for r in rows if r["size"] == size]
-        subset.sort(key=lambda r: r["ns_per_hash_median"])
-        rankings[str(size)] = [
-            {
-                "rank": i + 1,
-                "impl": r["impl"],
-                "backend": r.get("backend"),
-                "ns_per_hash_median": r["ns_per_hash_median"],
-                "gb_per_s_median": r["gb_per_s_median"],
-            }
-            for i, r in enumerate(subset)
-        ]
 
-    baselines = ["c-openssl", "rust-sha2", "go-stdlib"]
-    ratios: list[dict[str, Any]] = []
-    for size in sizes:
-        subset = {r["impl"]: r for r in rows if r["size"] == size}
-        base = next((b for b in baselines if b in subset), None)
-        if not base:
+def _claims(paired: list[dict[str, Any]], arch: str, cpu_models: list[str]) -> list[str]:
+    """Render the exact claim form the atlas promises to make, from paired data.
+
+    Only unanimous results are stated. The host population is described by how many
+    CPU models it spans rather than by naming one of them, because a stratum that
+    covers four models is not evidence about any single one.
+    """
+    if len(cpu_models) == 1:
+        population = f"{arch} ({cpu_models[0]})"
+    elif cpu_models:
+        population = f"{arch} (across {len(cpu_models)} CPU models)"
+    else:
+        population = arch
+
+    out: list[str] = []
+    for row in paired:
+        if row["impl"] == row["baseline"] or row["blocks_compared"] == 0:
             continue
-        base_ns = subset[base]["ns_per_hash_median"]
-        for impl, r in subset.items():
-            ratios.append(
-                {
-                    "size": size,
-                    "impl": impl,
-                    "backend": r.get("backend"),
-                    "baseline": base,
-                    "ratio_ns": r["ns_per_hash_median"] / base_ns if base_ns else None,
-                }
+        if row["blocks_faster_than_baseline"] != row["blocks_compared"]:
+            continue
+        out.append(
+            f"On {population}, {row['impl']} beat {row['baseline']} at "
+            f"{row['size']} B in {row['blocks_faster_than_baseline']}/"
+            f"{row['blocks_compared']} blocks, median on-machine ratio "
+            f"{row['ratio_ns_median']:.3f}."
+        )
+    return out
+
+
+def summarize_files(paths: list[Path], *, root: Path | None = None) -> dict[str, Any]:
+    """Aggregate campaign blocks, stratified by architecture.
+
+    `root` locates registry/implementations.yaml, which supplies backends and
+    leaderboard membership. It is auto-detected from the first result path when not
+    given; result files stored outside the repository need it passed explicitly.
+    """
+    blocks = load_blocks(paths)
+    if root is None and paths:
+        root = _find_root(paths[0].resolve())
+    meta = _load_registry_meta(root)
+
+    by_arch: dict[str, list[Block]] = defaultdict(list)
+    for b in blocks:
+        by_arch[b.arch].append(b)
+
+    rows_by_arch: dict[str, list[dict[str, Any]]] = {}
+    strata: dict[str, Any] = {}
+    all_sizes: set[int] = set()
+
+    for arch, arch_blocks in sorted(by_arch.items()):
+        rows = _rows_for_arch(arch_blocks, meta, arch)
+        rows_by_arch[arch] = rows
+        all_sizes.update(r["size"] for r in rows)
+
+        rankings: dict[str, list[dict[str, Any]]] = {}
+        for size in sorted({r["size"] for r in rows}):
+            subset = sorted(
+                (r for r in rows if r["size"] == size),
+                key=lambda r: r["ns_per_hash_median"],
             )
+            rankings[str(size)] = [
+                {
+                    "rank": i + 1,
+                    "impl": r["impl"],
+                    "backend": r["backend"],
+                    "ns_per_hash_median": r["ns_per_hash_median"],
+                    "ns_per_hash_cv": r["ns_per_hash_cv"],
+                    "gb_per_s_median": r["gb_per_s_median"],
+                }
+                for i, r in enumerate(subset)
+            ]
+
+        paired = _paired_ratios(arch_blocks, meta, arch)
+        model_counts: dict[str, int] = defaultdict(int)
+        for b in arch_blocks:
+            model_counts[b.cpu_model or "unknown"] += 1
+        models = sorted(model_counts)
+        strata[arch] = {
+            "arch": arch,
+            "block_count": len(arch_blocks),
+            "block_ids": [b.block_id for b in arch_blocks],
+            "cpu_models": models,
+            "cpu_model_block_counts": dict(sorted(model_counts.items())),
+            # One architecture is not one machine. When blocks land on several CPU
+            # models, absolute ns/hash medians average over hardware that differs;
+            # only the within-block paired ratios below are unaffected.
+            "cpu_models_distinct": len(models),
+            "absolute_medians_span_multiple_cpus": len(models) > 1,
+            "sha256_hw": sorted({str(b.sha256_hw) for b in arch_blocks}),
+            "openssl": sorted({b.openssl for b in arch_blocks if b.openssl}),
+            "rows": rows,
+            "rankings_by_size": rankings,
+            "paired_ratios": paired,
+            "backend_clusters": _backend_clusters(rows, meta, arch),
+            "leaderboards": _leaderboards(rows, meta, arch),
+            "claims": _claims(paired, arch, [m for m in models if m != "unknown"]),
+        }
 
     return {
-        "blocks": blocks,
-        "rows": rows,
-        "rankings_by_size": rankings,
-        "ratios_vs_baseline": ratios,
-        "backend_clusters_1mib": _backend_clusters(rows, backends, size=1_048_576),
-        "backend_clusters_64b": _backend_clusters(rows, backends, size=64),
+        "schema_version": SCHEMA_VERSION,
+        # Backends and leaderboards come from the registry; without it the summary is
+        # still valid but unlabelled, and saying so beats emitting silent nulls.
+        "registry_root": str(root) if root else None,
+        "registry_metadata_available": bool(meta.backends),
+        "block_count": len(blocks),
+        "blocks": [
+            {
+                "block_id": b.block_id,
+                "arch": b.arch,
+                "cpu_model": b.cpu_model,
+                "sha256_hw": b.sha256_hw,
+                "openssl": b.openssl,
+                "observations": len(b.observations),
+            }
+            for b in blocks
+        ],
+        "arch_block_counts": {a: len(v) for a, v in sorted(by_arch.items())},
+        "digest_agreement": _check_digest_agreement(blocks),
+        "strata": strata,
+        "arch_sensitivity": _arch_sensitivity(
+            rows_by_arch,
+            sorted(all_sizes),
+            {a: len(v) for a, v in by_arch.items()},
+        ),
     }
 
 
 summarize = summarize_files
+
+
+def render_markdown(summary: dict[str, Any], *, top: int = 8) -> str:
+    """Compact human-readable digest for CI job summaries."""
+    lines: list[str] = []
+    lines.append(f"Blocks: {summary['block_count']} — {summary['arch_block_counts']}")
+    da = summary["digest_agreement"]
+    lines.append(
+        f"Timed-path digest agreement: {'OK' if da['ok'] else 'FAILED'} "
+        f"({da['cells_checked']} cells, {da['disagreement_count']} disagreements)"
+    )
+    for arch, s in summary["strata"].items():
+        lines.append("")
+        lines.append(f"### {arch} — {', '.join(s['cpu_models']) or 'unknown CPU'} ({s['block_count']} blocks)")
+        for size in ("64", "1048576"):
+            ranking = s["rankings_by_size"].get(size)
+            if not ranking:
+                continue
+            lines.append(f"\n**{size} B** (ns/hash median, CV):\n")
+            lines.append("| rank | impl | backend | ns/hash | CV | GB/s |")
+            lines.append("|---|---|---|---|---|---|")
+            for r in ranking[:top]:
+                cv = f"{r['ns_per_hash_cv']:.3f}" if r["ns_per_hash_cv"] is not None else "—"
+                lines.append(
+                    f"| {r['rank']} | {r['impl']} | {r['backend']} | "
+                    f"{r['ns_per_hash_median']:.1f} | {cv} | {r['gb_per_s_median']:.3f} |"
+                )
+    sens = summary.get("arch_sensitivity") or []
+    if sens:
+        lines.append("\n### Architecture-sensitive implementations\n")
+        lines.append("| impl | size | ref arch ns | other arch ns | ratio | vs cohort |")
+        lines.append("|---|---|---|---|---|---|")
+        for e in sens:
+            if e["size"] != 1_048_576:
+                continue
+            lines.append(
+                f"| {e['impl']} | {e['size']} | {e['reference_ns_median']:.0f} | "
+                f"{e['other_ns_median']:.0f} | {e['ratio_other_over_reference']:.2f}x | "
+                f"{e['departure_from_cohort']:.2f}x |"
+            )
+    return "\n".join(lines)
