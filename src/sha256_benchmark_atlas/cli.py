@@ -71,6 +71,13 @@ def main(argv: list[str] | None = None) -> int:
         help="Exit non-zero if any timed-path digest disagreement is present",
     )
 
+    p_audit = sub.add_parser(
+        "audit",
+        help="Statically check built artifacts for a hardware SHA-256 datapath",
+    )
+    p_audit.add_argument("--ids", nargs="*", default=None)
+    p_audit.add_argument("-o", "--output", type=Path, default=None)
+
     p_arch = sub.add_parser(
         "archive",
         help="Store raw per-block observations as the committed evidence archive",
@@ -147,6 +154,33 @@ def main(argv: list[str] | None = None) -> int:
             shard=args.shard,
             shards=args.shards,
         )
+
+    if args.cmd == "audit":
+        import json
+
+        from .capability_audit import audit_all
+        from .registry import load_registry
+
+        report = audit_all(root, load_registry(root).by_id(args.ids))
+        text = json.dumps(report, indent=2)
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(text + "\n", encoding="utf-8")
+        for entry in report["implementations"]:
+            present = entry["hardware_sha256_present"]
+            mark = {True: "hw", False: "--", None: " ?"}[present]
+            detail = (
+                f"{entry['instruction_total']} instructions"
+                if present is not None
+                else entry["not_audited_reason"]
+            )
+            print(f"  [{mark}] {entry['id']}: {detail}")
+        print(
+            f"{report['with_hardware_path']}/{report['audited']} audited implementations "
+            f"ship a hardware SHA-256 path on {report['arch']} "
+            f"({report['skipped']} not auditable)"
+        )
+        return 0
 
     if args.cmd == "archive":
         import json

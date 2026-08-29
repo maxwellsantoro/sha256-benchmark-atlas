@@ -19,7 +19,7 @@ implementations/       per-candidate runners (same CLI contract)
 registry/              admitted / excluded implementations + provenance
 vectors/               NIST / FIPS short-message vectors
 harness via            `uv run sha256-atlas ...`
-results/latest/blocks/ raw per-block observations (the evidence archive)
+results/latest/blocks/ raw per-block observations + fingerprint + capability audit
 results/latest/        summary.json derived from those blocks
 analysis/              summarization helpers
 .github/workflows/     multi-shard GitHub Actions experimental blocks
@@ -60,12 +60,89 @@ all runners fill their buffer from the same seeded PRNG, so at a given (size, re
 they must agree. The correctness gate exercises `verify`, a different code path;
 without this a bench loop hashing the wrong bytes would be timed and published.
 
+## Mechanical decomposition
+
+A ranked list of ns/hash cannot tell you *why* one implementation differs from
+another. Two additions do.
+
+### Fixed cost vs per-block cost
+
+SHA-256 consumes whole 64-byte compression blocks, so cost is close to affine in
+block count: `ns = a + b · ceil((n+9)/64)`. Fitting that inside each block splits
+every implementation into two mechanically different quantities — `a`, everything
+the API wraps around the primitive, and `b`, the primitive itself.
+
+| x86_64 | a (ns/call) | b (ns/64B block) | asympt GB/s |
+|---|---|---|---|
+| rust-sha2 | 32 | 40.32 | 1.587 |
+| go-stdlib | 43 | 40.36 | 1.586 |
+| rust-ring | 64 | 40.32 | 1.587 |
+| c-openssl | 326 | 40.36 | 1.586 |
+| python-hashlib | 352 | 40.34 | 1.587 |
+| bun-crypto | 488 | 40.51 | 1.580 |
+| node-crypto | 869 | 40.61 | 1.576 |
+| python-cryptography | 1441 | 40.41 | 1.584 |
+| ruby-openssl | 1725 | 40.39 | 1.584 |
+| zig-std | 96 | 46.75 | 1.369 |
+| c-libsodium | 49 | 206.45 | 0.310 |
+| c-ref | −23 | 299.43 | 0.214 |
+
+`b` agrees to **0.8% across five unrelated codebases** — ring, RustCrypto, Go
+stdlib, OpenSSL and BoringSSL — which is the hardware ceiling stated directly
+rather than inferred from a ratio at one size. `a` spans **54×** over the same
+set: `c-openssl`'s 326 ns *is* the EVP context setup, and Ruby's extra ~1400 ns is
+interpreter overhead. That single number explains the entire small-message spread
+the 1 MiB table cannot see.
+
+The same split settles the aarch64 case without appeal to timing coincidence:
+`rust-sha2` has `a` = 21 ns (negligible) and `b` = 152.9 vs OpenSSL's 29.7. The
+penalty is in the compression function, so it is a different code path — not an
+API difference.
+
+Residuals against the fit are reported per size. Below 1 KiB the affine model is
+genuinely approximate and departures mean nothing; above it, it holds to a couple
+of percent for every ahead-of-time implementation, so a large residual is a real
+signal. It flags exactly the tiered runtimes and nothing else:
+
+```text
+java-jdk           75% at 4096 B      node-crypto        25% at 4096 B
+java-bouncycastle  27% at 4096 B      bun-crypto         13% at 4096 B
+```
+
+That is a runtime which never reached steady state at that size, not a property of
+SHA-256 — and it is a direct before/after metric for the warmup budget.
+
+### Static capability audit
+
+Whether a hardware SHA-256 datapath is even present is a question about the binary,
+not about timing. `sha256-atlas audit` disassembles each built artifact and the
+crypto libraries it links, counting the arch-specific mnemonics:
+
+```text
+rust-sha2 (aarch64)        0     libcrypto           1105
+rust-ring                 56     libsodium              0
+go-stdlib                 56     libmbedcrypto          0
+```
+
+Interpreted runners declare an `audit_artifact_cmd` in the registry saying where
+their native module actually lives, which covers the OpenSSL front-ends. A JIT
+intrinsic (`java-jdk`) exists only at run time and is reported as unknown rather
+than guessed at.
+
+The audit and the fitted `b` are independent answers to the same question, so
+`summary.json` cross-checks them and reports any disagreement under
+`audit_measurement_conflicts`. A fast implementation with no instructions found
+means the audit missed a library; instructions present with portable-looking timing
+means dispatch declined them. Either way it is a finding, not something to average
+away — and it is how `php-hash` was reclassified from `hardware_acceleration: auto`
+to `portable`.
+
 ## Experiment design (GitHub Actions)
 
 Each workflow job is one **experimental block**:
 
 1. Fingerprint CPU / OS / toolchains / library versions / SHA hardware support
-2. Build all admitted candidates
+2. Build all admitted candidates, then statically audit them for a SHA-256 datapath
 3. Correctness gate (NIST + boundaries + PRNG); only passers are timed
 4. **Interleaved** benches of all candidates on that same VM
 5. Archive raw observations, then summarize stratified by architecture
@@ -152,6 +229,7 @@ export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"   # if needed
 uv sync
 uv run sha256-atlas fingerprint
 uv run sha256-atlas build
+uv run sha256-atlas audit          # which binaries ship a hardware SHA-256 path
 uv run sha256-atlas correctness --cases 1000 --skip-million
 uv run sha256-atlas bench --reps 3 --max-size 65536 -o results/local-bench.json
 # or one shot:

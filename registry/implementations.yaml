@@ -125,6 +125,7 @@ implementations:
     leaderboards: [production]
     notes: CPython hashlib.sha256 — typically OpenSSL-backed on modern builds.
     build: null
+    audit_artifact_cmd: "python3 -c \"import importlib.util,sys; s=importlib.util.find_spec('_hashlib'); print(s.origin if s and s.origin and s.origin not in ('built-in','frozen') else sys.executable)\""
     binary: implementations/python-hashlib/sha256_runner.py
     interpreter: python
 
@@ -141,6 +142,8 @@ implementations:
     status: admitted
     leaderboards: [pure-language, portable, reference]
     notes: Pure-Python SHA-256 for abstraction-boundary contrast vs hashlib.
+    audit_artifact_cmd: null
+    audit_note: "Pure Python: no native artifact to audit by construction."
     slow: true
     build: null
     binary: implementations/python-pure/sha256_runner.py
@@ -160,6 +163,7 @@ implementations:
     leaderboards: [production]
     notes: Node.js crypto.createHash('sha256') — OpenSSL wrapper.
     build: null
+    audit_artifact_cmd: "node -e \"console.log(process.execPath)\""
     binary: implementations/node-crypto/sha256_runner.js
     interpreter: node
 
@@ -177,6 +181,8 @@ implementations:
     leaderboards: [production, native]
     notes: JDK MessageDigest.getInstance("SHA-256") default provider.
     build: javac -d implementations/java-jdk/out implementations/java-jdk/Sha256Runner.java
+    audit_artifact_cmd: null
+    audit_note: "SHA-256 is a JIT intrinsic emitted at run time, so no shipped artifact contains it; -XX:+PrintFlagsFinal reports UseSHA/UseSHA256Intrinsics instead."
     binary: implementations/java-jdk/out
     interpreter: java
     java_main: Sha256Runner
@@ -259,6 +265,7 @@ implementations:
     leaderboards: [production]
     notes: OpenSSL::Digest SHA-256 via CRuby openssl extension.
     build: null
+    audit_artifact_cmd: "ruby -e \"require 'openssl'; puts $LOADED_FEATURES.grep(/openssl\\.(so|bundle)/).first || RbConfig.ruby\""
     binary: implementations/ruby-openssl/sha256_runner.rb
     interpreter: ruby
 
@@ -271,11 +278,14 @@ implementations:
     source_commit: null
     implementation_class: production
     backend: php-hash-ext
-    hardware_acceleration: auto
+    hardware_acceleration: portable
     status: admitted
     leaderboards: [production]
-    notes: PHP hash('sha256') — backend varies by build (often OpenSSL).
+    notes: PHP hash('sha256') — php-src's own portable implementation, not OpenSSL;
+      static audit finds no SHA-256 instructions and the measured per-block cost
+      matches the portable cohort on both x86_64 and aarch64.
     build: null
+    audit_artifact_cmd: "php -r \"echo PHP_BINARY;\""
     binary: implementations/php-hash/sha256_runner.php
     interpreter: php
 
@@ -293,6 +303,7 @@ implementations:
     leaderboards: [production]
     notes: cryptography.hazmat SHA-256 (OpenSSL-backed on typical Linux builds).
     build: null
+    audit_artifact_cmd: "python3 -c \"from cryptography.hazmat.bindings import _rust; print(_rust.__file__)\""
     binary: implementations/python-cryptography/sha256_runner.py
     interpreter: python
 
@@ -310,6 +321,7 @@ implementations:
     leaderboards: [production]
     notes: Bun crypto.createHash — BoringSSL-backed, distinct from Node/OpenSSL path.
     build: null
+    audit_artifact_cmd: "bun -e \"console.log(process.execPath)\""
     binary: implementations/bun-crypto/sha256_runner.js
     interpreter: bun
 
@@ -366,6 +378,8 @@ implementations:
     leaderboards: [production, native, portable]
     notes: Bouncy Castle JCE provider SHA-256 (pure Java).
     build: bash implementations/java-bouncycastle/build.sh
+    audit_artifact_cmd: null
+    audit_note: "Pure Java: no native artifact to audit by construction."
     binary: implementations/java-bouncycastle/out
     java_cp: implementations/java-bouncycastle/bcprov.jar
     interpreter: java

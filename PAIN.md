@@ -117,3 +117,37 @@ should cite entries from this list.
 18. **Detection code needs a negative test on real foreign hardware** — the ARM
     fingerprint bug was invisible because the value it produced (`false`) was a plausible
     one. Prefer tri-state (`true`/`false`/unknown) for any capability probe.
+
+## Entries filed while adding mechanical decomposition (2026-08-29)
+
+19. **A ranked list of ns/hash is the wrong output shape** — 17 correlated numbers per
+    implementation hide the two that matter. Fitting `a + b*blocks` separates API cost
+    from primitive cost and makes "same backend" claims checkable: `b` agrees to 0.8%
+    across five unrelated codebases while `a` spans 54x over the same set.
+20. **R^2 is worthless when the x range spans four orders of magnitude** — an ordinary
+    least-squares fit reported R^2 > 0.999 for a model that was 68% wrong at 4 KiB.
+    Per-point relative residuals are the diagnostic; the summary statistic is not.
+21. **Weighting to fix residual balance biases the slope** — minimising relative error
+    discards exactly the large-size points that identify `b`. Fit the slope in the
+    asymptotic regime and the intercept in the small-message regime instead.
+22. **Residuals need a regime before they mean anything** — below ~1 KiB the affine
+    model is genuinely approximate (finalisation is neither fixed nor per-block), so a
+    large residual there is not a defect. Above it, a large residual is almost always a
+    tiered runtime that never reached steady state.
+23. **Static disassembly answers "which code path" directly** — counting arch-specific
+    SHA-256 mnemonics in the shipped artifact needs no runner, no timing and no
+    inference. Match whole mnemonics: aarch64 also advertises sha1/sha3/sha512, and
+    `sha256h` is a prefix of `sha256h2`.
+24. **Auditing an interpreter means finding its native module** — a venv `python3` is a
+    symlink to a launcher stub in front of `@rpath/libpython3.12.dylib`, which is where
+    the statically linked OpenSSL actually lives. Naive auditing of the named binary
+    reports "no hardware path" for an implementation running at 2.16 GB/s.
+25. **Registry-supplied commands must not go through a shell** — the Ruby probe contains
+    `$LOADED_FEATURES`, which a shell expands to nothing. `shlex.split` fixes it and
+    removes an injection surface at the same time.
+26. **Two independent methods disagreeing is a finding, not noise** — cross-checking the
+    audit against the fitted `b` caught a genuine audit gap (a system library behind the
+    macOS dyld shared cache) that neither method would have surfaced alone.
+27. **A registry field can be wrong for years without anyone noticing** — `php-hash` was
+    marked `hardware_acceleration: auto`; it ships no SHA-256 instructions and its
+    per-block cost matches the portable cohort on both architectures.

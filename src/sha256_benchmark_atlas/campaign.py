@@ -6,8 +6,10 @@ from pathlib import Path
 
 from .bench import run_interleaved_bench
 from .build import build_all
+from .capability_audit import audit_all
 from .correctness import run_correctness
 from .fingerprint import write_fingerprint
+from .registry import load_registry
 
 
 def run_campaign(
@@ -46,6 +48,14 @@ def run_campaign(
         return 1
     if ids:
         built_ids = [i for i in built_ids if i in ids]
+
+    print("== static capability audit")
+    audit = audit_all(root, load_registry(root).by_id(built_ids))
+    (out / "audit.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
+    print(
+        f"  {audit['with_hardware_path']}/{audit['audited']} audited implementations ship a "
+        f"hardware SHA-256 path on {audit['arch']} ({audit['skipped']} not auditable)"
+    )
 
     print("== correctness")
     correctness = run_correctness(

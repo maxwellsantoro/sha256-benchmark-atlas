@@ -108,6 +108,15 @@ def archive_blocks(block_dirs: list[Path], out_dir: Path) -> dict[str, Any]:
                 dest / "fingerprint.json.gz", _trim_fingerprint(_read_json(fp_path))
             )
 
+        # The static audit is per-host evidence about which code path shipped, and is
+        # only interpretable next to the timings from that same host.
+        audit_path = next(
+            (p for p in (block_dir / "audit.json", block_dir / "audit.json.gz") if p.is_file()),
+            None,
+        )
+        if audit_path is not None:
+            total += _write_gz(dest / "audit.json.gz", _read_json(audit_path))
+
         written.append(
             {
                 "block_id": block_id,

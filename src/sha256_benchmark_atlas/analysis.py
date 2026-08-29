@@ -24,9 +24,11 @@ from typing import Any
 
 import yaml
 
+from .capability_audit import cross_check
+from .costmodel import aggregate_models, fit_cost_model
 from .fingerprint import cpu_facts_from_fingerprint
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 # Preference order; the first one present in a block becomes that block's baseline.
 BASELINE_PREFERENCE = ("c-openssl", "rust-sha2", "go-stdlib")
@@ -85,6 +87,7 @@ class Block:
     sha256_hw: bool | None
     openssl: str | None
     observations: list[dict[str, Any]]
+    audit: dict[str, Any] | None = None
 
     def medians(self) -> dict[tuple[str, int], float]:
         """Median ns/hash per (impl, size) within this block, across its reps."""
@@ -144,6 +147,20 @@ def load_blocks(paths: list[Path]) -> list[Block]:
     for path in paths:
         data = _read_json(path)
         arch, host = _block_arch(path, data)
+        audit_path = next(
+            (
+                p
+                for p in (path.parent / "audit.json", path.parent / "audit.json.gz")
+                if p.is_file()
+            ),
+            None,
+        )
+        audit = None
+        if audit_path is not None:
+            try:
+                audit = _read_json(audit_path)
+            except (OSError, ValueError):
+                audit = None
         blocks.append(
             Block(
                 block_id=host.get("block_id") or path.parent.name or path.stem,
@@ -153,6 +170,7 @@ def load_blocks(paths: list[Path]) -> list[Block]:
                 sha256_hw=host.get("sha256_hw"),
                 openssl=host.get("openssl"),
                 observations=list(data.get("observations", [])),
+                audit=audit,
             )
         )
     return blocks
@@ -339,6 +357,36 @@ def _paired_ratios(
                 }
             )
     return out
+
+
+def _cost_models(
+    blocks: list[Block], meta: RegistryMeta, arch: str
+) -> list[dict[str, Any]]:
+    """Split each implementation into fixed per-call cost and per-block cost.
+
+    Fitted inside each block and then aggregated, for the same reason ratios are:
+    a fit spanning hosts of different speeds would smear the very quantity it is
+    trying to isolate.
+    """
+    per_impl: dict[str, list[Any]] = defaultdict(list)
+    for block in blocks:
+        by_impl_size: dict[str, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+        for o in block.observations:
+            if o.get("ok"):
+                by_impl_size[str(o["impl"])][int(o["size"])].append(float(o["ns_per_hash"]))
+        for impl, by_size in by_impl_size.items():
+            model = fit_cost_model({s: statistics.median(v) for s, v in by_size.items()})
+            if model is not None:
+                per_impl[impl].append(model)
+
+    rows: list[dict[str, Any]] = []
+    for impl, models in sorted(per_impl.items()):
+        agg = aggregate_models(models)
+        if agg is None:
+            continue
+        rows.append({"impl": impl, "backend": meta.backends.get(impl), "arch": arch, **agg})
+    rows.sort(key=lambda r: r["b_ns_per_block"]["median"])
+    return rows
 
 
 def _backend_clusters(
@@ -540,6 +588,8 @@ def summarize_files(paths: list[Path], *, root: Path | None = None) -> dict[str,
             ]
 
         paired = _paired_ratios(arch_blocks, meta, arch)
+        cost_models = _cost_models(arch_blocks, meta, arch)
+        audit = next((b.audit for b in arch_blocks if b.audit), None)
         model_counts: dict[str, int] = defaultdict(int)
         for b in arch_blocks:
             model_counts[b.cpu_model or "unknown"] += 1
@@ -560,6 +610,14 @@ def summarize_files(paths: list[Path], *, root: Path | None = None) -> dict[str,
             "rows": rows,
             "rankings_by_size": rankings,
             "paired_ratios": paired,
+            "cost_models": cost_models,
+            "capability_audit": audit,
+            # Two independent methods answering the same question: does this binary
+            # contain a SHA-256 datapath, and does its measured per-block cost look
+            # like one? Where they disagree, one of them is wrong.
+            "audit_measurement_conflicts": (
+                cross_check(audit, cost_models) if audit else []
+            ),
             "backend_clusters": _backend_clusters(rows, meta, arch),
             "leaderboards": _leaderboards(rows, meta, arch),
             "claims": _claims(paired, arch, [m for m in models if m != "unknown"]),
@@ -622,6 +680,34 @@ def render_markdown(summary: dict[str, Any], *, top: int = 8) -> str:
                     f"| {r['rank']} | {r['impl']} | {r['backend']} | "
                     f"{r['ns_per_hash_median']:.1f} | {cv} | {r['gb_per_s_median']:.3f} |"
                 )
+    for arch, s in summary["strata"].items():
+        models = s.get("cost_models") or []
+        if not models:
+            continue
+        lines.append(f"\n### {arch} — fixed cost vs per-block cost\n")
+        lines.append("| impl | a (ns/call) | b (ns/64B block) | asympt GB/s | hw path | steady state |")
+        lines.append("|---|---|---|---|---|---|")
+        audit = {
+            e["id"]: e for e in ((s.get("capability_audit") or {}).get("implementations") or [])
+        }
+        for r in models:
+            hw = audit.get(r["impl"], {}).get("hardware_sha256_present")
+            hw_s = {True: "yes", False: "no", None: "?"}[hw]
+            ss = "ok" if r["reached_steady_state"] else (
+                f"NO ({r['steady_state_residual'] * 100:.0f}% @{r['steady_state_residual_size']}B)"
+            )
+            lines.append(
+                f"| {r['impl']} | {r['a_ns_fixed']['median']:.0f} | "
+                f"{r['b_ns_per_block']['median']:.2f} | "
+                f"{r['asymptotic_gb_per_s']:.3f} | {hw_s} | {ss} |"
+            )
+        conflicts = s.get("audit_measurement_conflicts") or []
+        if conflicts:
+            lines.append(
+                f"\n{len(conflicts)} audit/measurement conflict(s): "
+                + ", ".join(c["impl"] for c in conflicts)
+            )
+
     sens = summary.get("arch_sensitivity") or []
     if sens:
         lines.append("\n### Architecture-sensitive implementations\n")
