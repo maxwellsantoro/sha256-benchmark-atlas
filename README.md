@@ -220,6 +220,12 @@ Computed per architecture and message size in `summary.json` under
 
 Requires: `uv`, a C compiler, OpenSSL headers (`libssl-dev` / Homebrew `openssl`), Rust (`cargo`), Go, Node, Java JDK. Optional for the expanded kernel set: Botan, Crypto++, Nettle, Libgcrypt, wolfSSL, NSS, Odin, .NET 8, Wasmtime, Zig (for the wasm guest).
 
+The source tree is required for wheel or editable-package use: `registry/`,
+`vectors/`, and the implementation files are runtime inputs and are not included
+in the harness package alone. These commands and retained results cover a bounded
+checked scope; they are not broad empirical proof of every implementation or
+hardware/toolchain combination.
+
 On macOS with Homebrew OpenSSL:
 
 ```bash
@@ -245,7 +251,14 @@ uv run sha256-atlas summarize results/latest/blocks/*/bench.json.gz --markdown
 2. Register it in `registry/implementations.yaml` with provenance, backend, and status
 3. Open a PR — CI builds, verifies, and benches it interleaved with the rest
 
-Currently admitted: **29** implementations (plus LibreSSL discovered, CryptoKit Apple-only) across C/C++, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, Java, Zig, Odin, C#, and Wasm — spanning OpenSSL, BoringSSL, LibreSSL, Botan, Crypto++, Nettle, Libgcrypt, wolfSSL, NSS, libsodium, mbedTLS, ring, RustCrypto (+asm), Bouncy Castle, Go/Zig/Odin stdlibs, .NET platform crypto, and portable/reference paths.
+The registry currently admits **29** implementations (plus LibreSSL discovered and
+CryptoKit Apple-only). The retained historical campaign contains 19 implementations
+that built and passed that run's gates; it is historical evidence for those 19, not
+a claim that the registry's current 29 entries were all present in that run. The
+entries span C/C++, Rust, Go, Python, JavaScript (Node/Bun), Ruby, PHP, Java, Zig,
+Odin, C#, and Wasm — including OpenSSL, BoringSSL, LibreSSL, Botan, Crypto++,
+Nettle, Libgcrypt, wolfSSL, NSS, libsodium, mbedTLS, ring, RustCrypto (+asm),
+Bouncy Castle, Go/Zig/Odin stdlibs, .NET platform crypto, and portable/reference paths.
 
 ## Correctness and its oracle
 

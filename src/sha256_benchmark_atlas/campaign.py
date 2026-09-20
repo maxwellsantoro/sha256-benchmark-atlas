@@ -4,7 +4,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .bench import run_interleaved_bench
+from .bench import bench_result_success, run_interleaved_bench
 from .build import build_all
 from .capability_audit import audit_all
 from .correctness import run_correctness
@@ -25,6 +25,22 @@ def run_campaign(
     shard: int = 0,
     shards: int = 1,
 ) -> int:
+    if type(reps) is not int or reps <= 0:
+        raise ValueError("reps must be a positive integer")
+    if type(max_size) is not int or max_size < 0:
+        raise ValueError("max_size must be a nonnegative integer")
+    if type(cases) is not int or cases < 0:
+        raise ValueError("cases must be a nonnegative integer")
+    if ids is not None and not ids:
+        raise ValueError("ids selection must not be empty")
+    reg = load_registry(root)
+    impls = reg.by_id(ids)
+    if not impls:
+        raise ValueError("implementation selection must not be empty")
+    if any(type(size) is not int or size < 0 for size in reg.message_sizes):
+        raise ValueError("registered sizes must contain only nonnegative integers")
+    if not [size for size in reg.message_sizes if size <= max_size]:
+        raise ValueError("no registered message sizes are within max_size")
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     out = output_dir or (root / "results" / f"campaign-{stamp}-shard{shard}")
     out.mkdir(parents=True, exist_ok=True)
@@ -50,7 +66,7 @@ def run_campaign(
         built_ids = [i for i in built_ids if i in ids]
 
     print("== static capability audit")
-    audit = audit_all(root, load_registry(root).by_id(built_ids))
+    audit = audit_all(root, reg.by_id(built_ids))
     (out / "audit.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
     print(
         f"  {audit['with_hardware_path']}/{audit['audited']} audited implementations ship a "
@@ -96,4 +112,4 @@ def run_campaign(
     (out / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {out}")
     print(json.dumps(meta, indent=2))
-    return 0
+    return 0 if bench_result_success(bench) else 1

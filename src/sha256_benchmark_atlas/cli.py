@@ -127,33 +127,43 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "bench":
         from .bench import run_interleaved_bench
 
-        result = run_interleaved_bench(
-            root,
-            ids=args.ids,
-            sizes=args.sizes,
-            reps=args.reps,
-            seed=args.seed,
-            max_size=args.max_size,
-            output=args.output,
-        )
+        try:
+            result = run_interleaved_bench(
+                root,
+                ids=args.ids,
+                sizes=args.sizes,
+                reps=args.reps,
+                seed=args.seed,
+                max_size=args.max_size,
+                output=args.output,
+            )
+        except (KeyError, ValueError) as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
         import json
 
         print(json.dumps({"observations": len(result["observations"]), "path": result.get("path")}))
-        return 0
+        from .bench import bench_result_success
+
+        return 0 if bench_result_success(result) else 1
 
     if args.cmd == "campaign":
-        return run_campaign(
-            root,
-            ids=args.ids,
-            reps=args.reps,
-            seed=args.seed,
-            cases=args.cases,
-            max_size=args.max_size,
-            skip_million=args.skip_million,
-            output_dir=args.output_dir,
-            shard=args.shard,
-            shards=args.shards,
-        )
+        try:
+            return run_campaign(
+                root,
+                ids=args.ids,
+                reps=args.reps,
+                seed=args.seed,
+                cases=args.cases,
+                max_size=args.max_size,
+                skip_million=args.skip_million,
+                output_dir=args.output_dir,
+                shard=args.shard,
+                shards=args.shards,
+            )
+        except (KeyError, ValueError) as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
 
     if args.cmd == "audit":
         import json

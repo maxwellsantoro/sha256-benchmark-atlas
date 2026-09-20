@@ -2,7 +2,47 @@ from __future__ import annotations
 
 import pytest
 
-from sha256_benchmark_atlas.bench import choose_iters
+from sha256_benchmark_atlas.bench import _validated_raw_result, choose_iters
+
+
+@pytest.mark.parametrize("key", ["ns_total", "hashes", "size", "digest"])
+def test_validated_raw_result_requires_fields(key: str) -> None:
+    raw = {"ns_total": 100, "hashes": 2, "size": 64, "digest": "a" * 64}
+    raw.pop(key)
+    with pytest.raises(ValueError):
+        _validated_raw_result(raw, size=64, iters=2)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"ns_total": 0},
+        {"ns_total": -1},
+        {"hashes": 1},
+        {"size": 65},
+        {"digest": None},
+        {"digest": "bad"},
+        {"ns_total": True},
+        {"hashes": 2.0},
+        {"size": "64"},
+    ],
+)
+def test_validated_raw_result_rejects_malformed_values(change: dict) -> None:
+    raw = {"ns_total": 100, "hashes": 2, "size": 64, "digest": "a" * 64}
+    raw.update(change)
+    with pytest.raises(ValueError):
+        _validated_raw_result(raw, size=64, iters=2)
+
+
+def test_validated_raw_result_accepts_positive_control() -> None:
+    assert (
+        _validated_raw_result(
+            {"ns_total": 100, "hashes": 2, "size": 64, "digest": "a" * 64},
+            size=64,
+            iters=2,
+        )["hashes"]
+        == 2
+    )
 
 
 @pytest.mark.parametrize(
