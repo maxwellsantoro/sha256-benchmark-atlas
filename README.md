@@ -40,7 +40,14 @@ Correctness uses `verify` so thousands of cases share one process.
 
 ## Quick start
 
-Requires: `uv`, a C compiler, OpenSSL headers (`libssl-dev` / Homebrew `openssl`), Rust (`cargo`), Go, Node, Java JDK.
+The default build includes every admitted candidate in
+[`registry/implementations.yaml`](registry/implementations.yaml). Requires: `uv`,
+a C compiler, OpenSSL headers (`libssl-dev` / Homebrew `openssl`), Rust (`cargo`),
+Go, Node, Java JDK 21, Zig 0.14.0, Ruby with OpenSSL, PHP, and Bun.
+[`campaign.yml`](.github/workflows/campaign.yml) owns the CI toolchain setup.
+Use the pinned Zig version: the current build script is incompatible with Zig
+0.16. Keep the selected Java and Zig binaries on `PATH` for both build and
+correctness commands. `uv sync` prepares the Python candidate dependencies.
 
 On macOS with Homebrew OpenSSL:
 
