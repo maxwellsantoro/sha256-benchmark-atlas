@@ -1,1 +1,1 @@
-{"run_id":39212845226,"run_url":"https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/39212845226","completed_at":"2026-10-19T07:05:24Z","blocks":12,"shards":"0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)","reps":5,"cases":10000,"max_size_bytes":1048576}
+{"run_id":40282876159,"run_url":"https://github.com/maxwellsantoro/sha256-benchmark-atlas/actions/runs/40282876159","completed_at":"2026-10-26T07:06:58Z","blocks":12,"shards":"0-11 (ubuntu-24.04 x64 + ubuntu-24.04-arm)","reps":5,"cases":10000,"max_size_bytes":1048576}
